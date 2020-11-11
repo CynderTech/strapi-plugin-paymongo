@@ -4,15 +4,58 @@
  *
  */
 
-import React, { memo, useState } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import { Button, Label, Toggle } from '@buffetjs/core';
 import { Header, Inputs } from '@buffetjs/custom';
+import { request } from 'strapi-helper-plugin';
 
 const HomePage = () => {
 	const [loading, setLoading] = useState(false);
 	const [testMode, setTestMode] = useState(true);
 	const [publicKey, setPublicKey] = useState('');
 	const [secretKey, setSecretKey] = useState('');
+
+	useEffect(() => {
+		const querySettings = async () => {
+			const modeQuery = `mode=${testMode ? 'test' : 'live'}`;
+
+			const {
+				api_keys: { public_key: retrievedPublicKey, secret_key: retrievedSecretKey },
+			} = await request(`/paymongo/settings?${modeQuery}`);
+
+			setLoading(false);
+
+			setPublicKey(retrievedPublicKey || '');
+			setSecretKey(retrievedSecretKey || '');
+		};
+
+		setLoading(true);
+
+		querySettings();
+	}, [testMode]);
+
+	const getKeyIndentifier = (identifier) => `${testMode ? 'test' : 'live'}_${identifier}_key`;
+
+	const handleSubmit = async () => {
+		const payload = {
+			[getKeyIndentifier('public')]: publicKey,
+			[getKeyIndentifier('secret')]: secretKey,
+		};
+
+		try {
+			const { ok } = await request('/paymongo/settings', {
+				method: 'POST',
+				body: payload,
+			});
+
+			if (ok) {
+				strapi.notification.success('Successfully saved changes');
+			}
+		} catch (err) {
+			/** Need better error handling */
+			strapi.notification.error('Something went wrong. Contact administrator.');
+		}
+	};
 
 	const renderTestKeys = () => {
 		const prefix = testMode ? 'Test' : 'Live';
@@ -50,7 +93,7 @@ const HomePage = () => {
 					/>
 				</div>
 				<div className="col-6 row justify-content-end">
-					<Button color="primary" label="Save Changes" />
+					<Button color="primary" label="Save Changes" onClick={handleSubmit} />
 				</div>
 			</div>
 			<div class="row">

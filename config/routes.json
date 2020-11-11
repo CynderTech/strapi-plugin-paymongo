@@ -7,6 +7,22 @@
       "config": {
         "policies": []
       }
+    },
+    {
+      "method": "GET",
+      "path": "/settings",
+      "handler": "paymongo.getSettings",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/settings",
+      "handler": "paymongo.setSettings",
+      "config": {
+        "policies": []
+      }
     }
   ]
 }
