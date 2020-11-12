@@ -5,12 +5,15 @@ module.exports = async () => {
 		name: 'users-permissions',
 	});
 
-	const settingsValue = {
-		live_public_key: null,
-		live_secret_key: null,
-		test_public_key: null,
-		test_secret_key: null,
-	};
+	if (!(await pluginStore.get({ key: 'settings' }))) {
+		const settingsValue = {
+			test_mode: true,
+			live_public_key: null,
+			live_secret_key: null,
+			test_public_key: null,
+			test_secret_key: null,
+		};
 
-	await pluginStore.set({ key: 'settings', value: settingsValue });
+		await pluginStore.set({ key: 'settings', value: settingsValue });
+	}
 };

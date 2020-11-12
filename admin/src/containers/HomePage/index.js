@@ -12,34 +12,42 @@ import { request } from 'strapi-helper-plugin';
 const HomePage = () => {
 	const [loading, setLoading] = useState(false);
 	const [testMode, setTestMode] = useState(true);
-	const [publicKey, setPublicKey] = useState('');
-	const [secretKey, setSecretKey] = useState('');
+	const [livePublicKey, setLivePublicKey] = useState('');
+	const [liveSecretKey, setLiveSecretKey] = useState('');
+	const [testPublicKey, setTestPublicKey] = useState('');
+	const [testSecretKey, setTestSecretKey] = useState('');
 
 	useEffect(() => {
 		const querySettings = async () => {
-			const modeQuery = `mode=${testMode ? 'test' : 'live'}`;
-
 			const {
-				api_keys: { public_key: retrievedPublicKey, secret_key: retrievedSecretKey },
-			} = await request(`/paymongo/settings?${modeQuery}`);
+				live_public_key: retrievedLivePublicKey,
+				live_secret_key: retrievedLiveSecretKey,
+				test_mode: retrievedTestMode,
+				test_public_key: retrievedTestPublicKey,
+				test_secret_key: retrievedTestSecretKey,
+			} = await request('/paymongo/settings');
 
 			setLoading(false);
 
-			setPublicKey(retrievedPublicKey || '');
-			setSecretKey(retrievedSecretKey || '');
+			setLivePublicKey(retrievedLivePublicKey || '');
+			setLiveSecretKey(retrievedLiveSecretKey || '');
+			setTestPublicKey(retrievedTestPublicKey || '');
+			setTestSecretKey(retrievedTestSecretKey || '');
+			setTestMode(retrievedTestMode);
 		};
 
 		setLoading(true);
 
 		querySettings();
-	}, [testMode]);
-
-	const getKeyIndentifier = (identifier) => `${testMode ? 'test' : 'live'}_${identifier}_key`;
+	}, []);
 
 	const handleSubmit = async () => {
 		const payload = {
-			[getKeyIndentifier('public')]: publicKey,
-			[getKeyIndentifier('secret')]: secretKey,
+			live_public_key: livePublicKey,
+			live_secret_key: liveSecretKey,
+			test_mode: testMode,
+			test_public_key: testPublicKey,
+			test_secret_key: testSecretKey,
 		};
 
 		try {
@@ -57,25 +65,39 @@ const HomePage = () => {
 		}
 	};
 
-	const renderTestKeys = () => {
-		const prefix = testMode ? 'Test' : 'Live';
-
+	const renderKeys = () => {
 		return (
 			<div class="row mb-5">
 				<div className="col-12">
 					<Inputs
-						label={`${prefix} Public Key`}
-						onChange={(e) => setPublicKey(e.target.value)}
+						label="Live Public Key"
+						onChange={(e) => setLivePublicKey(e.target.value)}
 						type="text"
-						value={publicKey}
+						value={livePublicKey}
 					/>
 				</div>
 				<div className="col-12">
 					<Inputs
-						label={`${prefix} Secret Key`}
-						onChange={(e) => setSecretKey(e.target.value)}
+						label="Live Secret Key"
+						onChange={(e) => setLiveSecretKey(e.target.value)}
 						type="text"
-						value={secretKey}
+						value={liveSecretKey}
+					/>
+				</div>
+				<div className="col-12">
+					<Inputs
+						label="Test Public Key"
+						onChange={(e) => setTestPublicKey(e.target.value)}
+						type="text"
+						value={testPublicKey}
+					/>
+				</div>
+				<div className="col-12">
+					<Inputs
+						label="Test Secret Key"
+						onChange={(e) => setTestSecretKey(e.target.value)}
+						type="text"
+						value={testSecretKey}
 					/>
 				</div>
 			</div>
@@ -115,7 +137,7 @@ const HomePage = () => {
 								/>
 							</div>
 						</div>
-						{!loading && renderTestKeys()}
+						{!loading && renderKeys()}
 					</div>
 				</div>
 			</div>

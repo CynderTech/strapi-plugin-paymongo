@@ -2,14 +2,6 @@
   "routes": [
     {
       "method": "GET",
-      "path": "/",
-      "handler": "paymongo.index",
-      "config": {
-        "policies": []
-      }
-    },
-    {
-      "method": "GET",
       "path": "/settings",
       "handler": "paymongo.getSettings",
       "config": {
@@ -20,6 +12,14 @@
       "method": "POST",
       "path": "/settings",
       "handler": "paymongo.setSettings",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/payment-intent",
+      "handler": "paymongo.createPaymentIntent",
       "config": {
         "policies": []
       }

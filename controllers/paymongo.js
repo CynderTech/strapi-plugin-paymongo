@@ -5,23 +5,9 @@
  */
 
 const _ = require('lodash');
+const axios = require('axios');
 
 module.exports = {
-	/**
-	 * Default action.
-	 *
-	 * @return {Object}
-	 */
-
-	index: async (ctx) => {
-		// Add your own logic here.
-
-		// Send 200 `ok`
-		ctx.send({
-			message: 'ok',
-		});
-	},
-
 	getSettings: async (ctx) => {
 		const pluginSettingsStore = await strapi.store({
 			environment: '',
@@ -30,41 +16,88 @@ module.exports = {
 			key: 'settings',
 		});
 
-		const mode = _.get(ctx, 'query.mode', 'test');
+		const settings = await pluginSettingsStore.get();
 
-		const getKeyIdentifier = (identifier) => `${mode}_${identifier}_key`;
-		const getKey = (keyIdentifier) => pluginSettingsStore.get(keyIdentifier);
-
-		const publicKeyIdentifier = getKeyIdentifier('public');
-		const { [publicKeyIdentifier]: publicKey } = await getKey(publicKeyIdentifier);
-
-		const secretKeyIdentifier = getKeyIdentifier('secret');
-		const { [secretKeyIdentifier]: secretKey } = await getKey(secretKeyIdentifier);
-
-		const apiKeys = {
-			public_key: publicKey,
-			secret_key: secretKey,
-		};
-
-		ctx.send({
-			api_keys: apiKeys,
-		});
+		ctx.send(settings);
 	},
 
 	setSettings: async (ctx) => {
-		const pluginSettings = strapi.store({
+		const pluginSettingsStore = strapi.store({
 			environment: '',
 			type: 'plugin',
 			name: 'paymongo',
 			key: 'settings',
 		});
 
-		const settings = await pluginSettings.get();
+		const settings = await pluginSettingsStore.get();
 
-		await pluginSettings.set({ value: { ...settings, ...ctx.request.body } });
+		await pluginSettingsStore.set({ value: { ...settings, ...ctx.request.body } });
 
 		ctx.send({
 			ok: true,
 		});
+	},
+
+	createPaymentIntent: async (ctx, next) => {
+		const { amount } = ctx.request.body;
+
+		if (!amount) {
+			ctx.status = 400;
+			ctx.body = {
+				errors: [
+					{
+						detail: 'Invalid amount',
+					},
+				],
+			};
+			await next();
+			return;
+		}
+
+		const payload = {
+			data: {
+				attributes: {
+					amount: amount * 100,
+					payment_method_allowed: ['card'],
+					currency: 'PHP',
+				},
+			},
+		};
+
+		const settings = await strapi
+			.store({
+				environment: '',
+				type: 'plugin',
+				name: 'paymongo',
+				key: 'settings',
+			})
+			.get();
+
+		const { test_mode: testMode } = settings;
+		const mode = testMode ? 'test' : 'live';
+
+		const getKey = (identifier) => settings[`${mode}_${identifier}_key`];
+
+		const headers = {
+			Accept: 'application/json',
+			'Content-Type': 'application/json',
+			Authorization: `Basic ${Buffer.from(`${getKey('secret')}:`).toString('base64')}`,
+		};
+
+		try {
+			const result = await axios.post(
+				`${process.env.PAYMONGO_BASE_URL}/payment_intents`,
+				payload,
+				{ headers },
+			);
+			ctx.send(result.data);
+		} catch (err) {
+			const { errors } = err.response.data;
+
+			ctx.status = err.response.status;
+			ctx.body = { errors };
+
+			await next();
+		}
 	},
 };
