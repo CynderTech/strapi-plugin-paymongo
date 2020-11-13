@@ -17,10 +17,14 @@ const HomePage = () => {
 	const [testPublicKey, setTestPublicKey] = useState('');
 	const [testSecretKey, setTestSecretKey] = useState('');
 	const [webhookSecretKey, setWebhookSecretKey] = useState('');
+	const [checkoutSuccessUrl, setCheckoutSuccessUrl] = useState('');
+	const [checkoutFailureUrl, setCheckoutFailureUrl] = useState('');
 
 	useEffect(() => {
 		const querySettings = async () => {
 			const {
+				checkout_failure_url: retrievedCheckoutFailureUrl,
+				checkout_success_url: retrievedCheckoutSuccessUrl,
 				live_public_key: retrievedLivePublicKey,
 				live_secret_key: retrievedLiveSecretKey,
 				test_mode: retrievedTestMode,
@@ -37,6 +41,8 @@ const HomePage = () => {
 			setTestSecretKey(retrievedTestSecretKey || '');
 			setTestMode(retrievedTestMode);
 			setWebhookSecretKey(retrievedWebhookSecretKey || '');
+			setCheckoutSuccessUrl(retrievedCheckoutSuccessUrl || '');
+			setCheckoutFailureUrl(retrievedCheckoutFailureUrl || '');
 		};
 
 		setLoading(true);
@@ -52,6 +58,8 @@ const HomePage = () => {
 			test_public_key: testPublicKey,
 			test_secret_key: testSecretKey,
 			webhook_secret_key: webhookSecretKey,
+			checkout_failure_url: checkoutFailureUrl,
+			checkout_success_url: checkoutSuccessUrl,
 		};
 
 		try {
@@ -124,6 +132,29 @@ const HomePage = () => {
 						onChange={(e) => setWebhookSecretKey(e.target.value)}
 						type="text"
 						value={webhookSecretKey}
+					/>
+				</div>
+				<div className="col-12">
+					<Padded bottom>
+						<Text fontSize="lg" fontWeight="bold">
+							Redirect URLs
+						</Text>
+					</Padded>
+				</div>
+				<div className="col-12">
+					<Inputs
+						label="Checkout Success"
+						onChange={(e) => setCheckoutSuccessUrl(e.target.value)}
+						type="text"
+						value={checkoutSuccessUrl}
+					/>
+				</div>
+				<div className="col-12">
+					<Inputs
+						label="Checkout Failure"
+						onChange={(e) => setCheckoutFailureUrl(e.target.value)}
+						type="text"
+						value={checkoutFailureUrl}
 					/>
 				</div>
 			</div>

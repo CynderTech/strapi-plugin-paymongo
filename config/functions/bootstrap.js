@@ -13,6 +13,8 @@ module.exports = async () => {
 			test_public_key: null,
 			test_secret_key: null,
 			webhook_secret_key: null,
+			checkout_success_url: null,
+			checkout_failure_url: null,
 		};
 
 		await pluginStore.set({ key: 'settings', value: settingsValue });
