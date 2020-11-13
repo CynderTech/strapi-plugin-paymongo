@@ -4,9 +4,6 @@
  * @description: A set of functions called "actions" of the `paymongo` plugin.
  */
 
-const _ = require('lodash');
-const axios = require('axios');
-
 module.exports = {
 	getSettings: async (ctx) => {
 		const pluginSettingsStore = await strapi.store({
@@ -54,42 +51,42 @@ module.exports = {
 			return;
 		}
 
-		const payload = {
-			data: {
-				attributes: {
-					amount: amount * 100,
-					payment_method_allowed: ['card'],
-					currency: 'PHP',
-				},
-			},
-		};
+		try {
+			const result = await strapi.plugins.paymongo.services.paymongo.createPaymentIntent(
+				amount,
+			);
+			ctx.send(result.data);
+		} catch (err) {
+			const { errors } = err.response.data;
 
-		const settings = await strapi
-			.store({
-				environment: '',
-				type: 'plugin',
-				name: 'paymongo',
-				key: 'settings',
-			})
-			.get();
+			ctx.status = err.response.status;
+			ctx.body = { errors };
 
-		const { test_mode: testMode } = settings;
-		const mode = testMode ? 'test' : 'live';
+			await next();
+		}
+	},
 
-		const getKey = (identifier) => settings[`${mode}_${identifier}_key`];
+	createSource: async (ctx, next) => {
+		const { amount, type } = ctx.request.body;
 
-		const headers = {
-			Accept: 'application/json',
-			'Content-Type': 'application/json',
-			Authorization: `Basic ${Buffer.from(`${getKey('secret')}:`).toString('base64')}`,
-		};
+		const validTypes = ['gcash', 'grab_pay'];
+
+		if (!validTypes.includes(type)) {
+			ctx.status = 400;
+			ctx.body = {
+				errors: [
+					{
+						detail: 'Invalid payment type',
+					},
+				],
+			};
+
+			await next();
+			return;
+		}
 
 		try {
-			const result = await axios.post(
-				`${process.env.PAYMONGO_BASE_URL}/payment_intents`,
-				payload,
-				{ headers },
-			);
+			const result = await strapi.plugins.paymongo.services.createSource(amount, type);
 			ctx.send(result.data);
 		} catch (err) {
 			const { errors } = err.response.data;
