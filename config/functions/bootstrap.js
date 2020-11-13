@@ -12,6 +12,7 @@ module.exports = async () => {
 			live_secret_key: null,
 			test_public_key: null,
 			test_secret_key: null,
+			webhook_secret_key: null,
 		};
 
 		await pluginStore.set({ key: 'settings', value: settingsValue });

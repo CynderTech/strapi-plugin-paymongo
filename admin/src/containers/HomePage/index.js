@@ -5,7 +5,7 @@
  */
 
 import React, { memo, useEffect, useState } from 'react';
-import { Button, Label, Toggle } from '@buffetjs/core';
+import { Button, Label, Padded, Text, Toggle } from '@buffetjs/core';
 import { Header, Inputs } from '@buffetjs/custom';
 import { request } from 'strapi-helper-plugin';
 
@@ -16,6 +16,7 @@ const HomePage = () => {
 	const [liveSecretKey, setLiveSecretKey] = useState('');
 	const [testPublicKey, setTestPublicKey] = useState('');
 	const [testSecretKey, setTestSecretKey] = useState('');
+	const [webhookSecretKey, setWebhookSecretKey] = useState('');
 
 	useEffect(() => {
 		const querySettings = async () => {
@@ -25,6 +26,7 @@ const HomePage = () => {
 				test_mode: retrievedTestMode,
 				test_public_key: retrievedTestPublicKey,
 				test_secret_key: retrievedTestSecretKey,
+				webhook_secret_key: retrievedWebhookSecretKey,
 			} = await request('/paymongo/settings');
 
 			setLoading(false);
@@ -34,6 +36,7 @@ const HomePage = () => {
 			setTestPublicKey(retrievedTestPublicKey || '');
 			setTestSecretKey(retrievedTestSecretKey || '');
 			setTestMode(retrievedTestMode);
+			setWebhookSecretKey(retrievedWebhookSecretKey || '');
 		};
 
 		setLoading(true);
@@ -65,9 +68,16 @@ const HomePage = () => {
 		}
 	};
 
-	const renderKeys = () => {
+	const renderFields = () => {
 		return (
 			<div class="row mb-5">
+				<div className="col-12">
+					<Padded bottom>
+						<Text fontSize="lg" fontWeight="bold">
+							API Keys
+						</Text>
+					</Padded>
+				</div>
 				<div className="col-12">
 					<Inputs
 						label="Live Public Key"
@@ -98,6 +108,21 @@ const HomePage = () => {
 						onChange={(e) => setTestSecretKey(e.target.value)}
 						type="text"
 						value={testSecretKey}
+					/>
+				</div>
+				<div className="col-12">
+					<Padded bottom>
+						<Text fontSize="lg" fontWeight="bold">
+							Webhook Settings
+						</Text>
+					</Padded>
+				</div>
+				<div className="col-12">
+					<Inputs
+						label="Webhook Signing Secret"
+						onChange={(e) => setWebhookSecretKey(e.target.value)}
+						type="text"
+						value={webhookSecretKey}
 					/>
 				</div>
 			</div>
@@ -137,7 +162,7 @@ const HomePage = () => {
 								/>
 							</div>
 						</div>
-						{!loading && renderKeys()}
+						{!loading && renderFields()}
 					</div>
 				</div>
 			</div>
