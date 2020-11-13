@@ -51,6 +51,7 @@ const HomePage = () => {
 			test_mode: testMode,
 			test_public_key: testPublicKey,
 			test_secret_key: testSecretKey,
+			webhook_secret_key: webhookSecretKey,
 		};
 
 		try {
