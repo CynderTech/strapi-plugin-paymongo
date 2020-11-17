@@ -64,10 +64,9 @@ module.exports = {
 				key: 'settings',
 			})
 			.get();
-
 		const payload = constructPayload({
 			type,
-			amount,
+			amount: amount * 100,
 			currency: 'PHP',
 			redirect: {
 				success: checkoutSuccessUrl,
