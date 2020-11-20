@@ -80,4 +80,23 @@ module.exports = {
 
 		return result;
 	},
+
+	/** https://developers.paymongo.com/reference#create-a-payment */
+	createPayment: async (amount, sourceId, paymentId) => {
+		const payload = constructPayload({
+			amount,
+			description: `Ramen Kuroda - ${paymentId}`, // need to change this to a setting at some point,
+			currency: 'PHP',
+			source: {
+				id: sourceId,
+				type: 'source',
+			},
+		});
+
+		const result = await axios.post(`${process.env.PAYMONGO_BASE_URL}/payments`, payload, {
+			headers: await getHeaders(),
+		});
+
+		return result;
+	},
 };

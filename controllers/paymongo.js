@@ -99,4 +99,63 @@ module.exports = {
 			await next();
 		}
 	},
+
+	handleWebhook: async (ctx) => {
+		/** Always respond with 200 to avoid webhook request to be resent */
+		ctx.status = 200;
+		ctx.send();
+
+		const {
+			data: { attributes, type },
+		} = ctx.request.body;
+		const {
+			data: {
+				attributes: { amount, status, type: sourceType },
+				id: sourceId,
+			},
+			type: eventType,
+		} = attributes;
+
+		const validEventTypes = ['source.chargeable'];
+
+		/** If not a valid event type, ignore */
+		if (type === 'event' && !validEventTypes.includes(eventType)) return;
+
+		if (status === 'chargeable') {
+			/** Query all payments for now, Strapi can't filter components */
+			const payments = await strapi.query('payment').find({
+				paymentType: sourceType,
+			});
+
+			const payment = payments.find(({ paymentOption: { eWallet } }) => {
+				return eWallet.type === sourceType && eWallet.sourceId === sourceId;
+			});
+
+			if (!payment) return;
+
+			const {
+				id,
+				paymentId,
+				paymentOption: { eWallet },
+			} = payment;
+
+			const {
+				data: {
+					data: { id: paymongoPaymentId },
+				},
+			} = await strapi.plugins.paymongo.services.paymongo.createPayment(
+				amount,
+				sourceId,
+				paymentId,
+			);
+
+			await strapi.query('payment').update(
+				{ id },
+				{
+					paymentOption: { eWallet: { ...eWallet, reference: paymongoPaymentId } },
+					status: 'paid',
+				},
+			);
+		}
+	},
 };

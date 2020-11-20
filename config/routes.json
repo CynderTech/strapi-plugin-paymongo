@@ -31,6 +31,14 @@
       "config": {
         "policies": []
       }
+    },
+    {
+      "method": "POST",
+      "path": "/webhook",
+      "handler": "paymongo.handleWebhook",
+      "config": {
+        "policies": []
+      }
     }
   ]
 }
