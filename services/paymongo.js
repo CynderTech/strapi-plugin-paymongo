@@ -5,6 +5,7 @@
  */
 
 const axios = require('axios');
+const crypto = require('crypto');
 
 const getHeaders = async (useSecret = true) => {
 	const settings = await strapi
@@ -98,5 +99,33 @@ module.exports = {
 		});
 
 		return result;
+	},
+
+	verifyWebhook: async (headers, payload) => {
+		const paymongoHeader = headers['paymongo-signature'];
+
+		if (!paymongoHeader) return false;
+
+		const [timestamp, testSig, liveSig] = paymongoHeader.split(',');
+
+		if (!timestamp || !testSig || !liveSig) return false;
+
+		const { test_mode: testMode, webhook_secret_key: webhookSecretKey } = await strapi
+			.store({
+				environment: '',
+				type: 'plugin',
+				name: 'paymongo',
+				key: 'settings',
+			})
+			.get();
+
+		const signatureComposition = `${timestamp.slice(2)}.${payload}`;
+		const hmac = crypto.createHmac('sha256', webhookSecretKey);
+		hmac.update(signatureComposition, 'utf8');
+		const signature = hmac.digest('hex');
+
+		const sigToCompare = testMode ? testSig.slice(3) : liveSig.slice(3);
+
+		return signature === sigToCompare;
 	},
 };

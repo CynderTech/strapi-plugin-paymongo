@@ -4,6 +4,8 @@
  * @description: A set of functions called "actions" of the `paymongo` plugin.
  */
 
+const unparsed = require('koa-body/unparsed');
+
 module.exports = {
 	getSettings: async (ctx) => {
 		const pluginSettingsStore = await strapi.store({
@@ -101,6 +103,18 @@ module.exports = {
 	},
 
 	handleWebhook: async (ctx) => {
+		try {
+			const validRequest = await strapi.plugins.paymongo.services.paymongo.verifyWebhook(
+				ctx.request.headers,
+				ctx.request.body[unparsed],
+			);
+
+			if (!validRequest) throw new Error('Invalid webhook request');
+		} catch (err) {
+			/** Do something if not valid webhook request */
+			return;
+		}
+
 		/** Always respond with 200 to avoid webhook request to be resent */
 		ctx.status = 200;
 		ctx.send();
