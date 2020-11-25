@@ -2,7 +2,7 @@ module.exports = async () => {
 	const pluginStore = strapi.store({
 		environment: '',
 		type: 'plugin',
-		name: 'users-permissions',
+		name: 'paymongo',
 	});
 
 	if (!(await pluginStore.get({ key: 'settings' }))) {
