@@ -73,7 +73,7 @@ module.exports = {
 			currency: 'PHP',
 			redirect: {
 				success: platform === 'web' ? checkoutSuccessUrlWeb : checkoutSuccessUrlMobile,
-				failed: platform === 'web' ? checkoutFailureUrlMobile : checkoutFailureUrlMobile,
+				failed: platform === 'web' ? checkoutFailureUrlWeb : checkoutFailureUrlMobile,
 			},
 		});
 
