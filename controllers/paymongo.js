@@ -57,7 +57,7 @@ module.exports = {
 			const result = await strapi.plugins.paymongo.services.paymongo.createPaymentIntent(
 				amount,
 			);
-			ctx.send(result.data);
+			ctx.send(result);
 		} catch (err) {
 			const { errors } = err.response.data;
 
@@ -91,7 +91,7 @@ module.exports = {
 				amount,
 				type,
 			);
-			ctx.send(result.data);
+			ctx.send(result);
 		} catch (err) {
 			const { errors } = err.response.data;
 
@@ -154,9 +154,7 @@ module.exports = {
 			} = payment;
 
 			const {
-				data: {
-					data: { id: paymongoPaymentId },
-				},
+				data: { id: paymongoPaymentId },
 			} = await strapi.plugins.paymongo.services.paymongo.createPayment(
 				amount,
 				sourceId,
