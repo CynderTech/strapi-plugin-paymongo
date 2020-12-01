@@ -14,7 +14,9 @@ module.exports = async () => {
 			test_secret_key: null,
 			webhook_secret_key: null,
 			checkout_success_url: null,
-			checkout_failure_url: null,
+      checkout_failure_url: null,
+      checkout_success_url_mobile: null,
+			checkout_failure_url_mobile: null,
 		};
 
 		await pluginStore.set({ key: 'settings', value: settingsValue });

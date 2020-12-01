@@ -17,14 +17,18 @@ const HomePage = () => {
 	const [testPublicKey, setTestPublicKey] = useState('');
 	const [testSecretKey, setTestSecretKey] = useState('');
 	const [webhookSecretKey, setWebhookSecretKey] = useState('');
-	const [checkoutSuccessUrl, setCheckoutSuccessUrl] = useState('');
-	const [checkoutFailureUrl, setCheckoutFailureUrl] = useState('');
+	const [checkoutSuccessUrl, setCheckoutSuccessUrlWeb] = useState('');
+  const [checkoutFailureUrl, setCheckoutFailureUrlWeb] = useState('');
+  const [checkoutSuccessUrl, setCheckoutSuccessUrlMobile] = useState('');
+	const [checkoutFailureUrl, setCheckoutFailureUrlMobile] = useState('');
 
 	useEffect(() => {
 		const querySettings = async () => {
 			const {
 				checkout_failure_url: retrievedCheckoutFailureUrl,
-				checkout_success_url: retrievedCheckoutSuccessUrl,
+        checkout_failure_url_mobile: retrievedCheckoutFailureUrlMobile,
+        checkout_success_url: retrievedCheckoutSuccessUrl,
+        checkout_success_url_mobile: retrievedCheckoutSuccessUrlMobile,
 				live_public_key: retrievedLivePublicKey,
 				live_secret_key: retrievedLiveSecretKey,
 				test_mode: retrievedTestMode,
@@ -41,8 +45,10 @@ const HomePage = () => {
 			setTestSecretKey(retrievedTestSecretKey || '');
 			setTestMode(retrievedTestMode);
 			setWebhookSecretKey(retrievedWebhookSecretKey || '');
-			setCheckoutSuccessUrl(retrievedCheckoutSuccessUrl || '');
-			setCheckoutFailureUrl(retrievedCheckoutFailureUrl || '');
+			setCheckoutSuccessUrlWeb(retrievedCheckoutSuccessUrl || '');
+      setCheckoutFailureUrlWeb(retrievedCheckoutFailureUrl || '');
+      setCheckoutSuccessUrlMobile(retrievedCheckoutSuccessUrlMobile || '');
+			setCheckoutFailureUrlMobile(retrievedCheckoutFailureUrlMobile || '');
 		};
 
 		setLoading(true);
@@ -143,16 +149,32 @@ const HomePage = () => {
 				</div>
 				<div className="col-12">
 					<Inputs
-						label="Checkout Success"
-						onChange={(e) => setCheckoutSuccessUrl(e.target.value)}
+						label="Checkout Success (Web)"
+						onChange={(e) => setCheckoutSuccessUrlWeb(e.target.value)}
 						type="text"
 						value={checkoutSuccessUrl}
 					/>
 				</div>
 				<div className="col-12">
 					<Inputs
-						label="Checkout Failure"
-						onChange={(e) => setCheckoutFailureUrl(e.target.value)}
+						label="Checkout Failure (Web)"
+						onChange={(e) => setCheckoutFailureUrlWeb(e.target.value)}
+						type="text"
+						value={checkoutFailureUrl}
+					/>
+				</div>
+        <div className="col-12">
+					<Inputs
+						label="Checkout Success (Mobile)"
+						onChange={(e) => setCheckoutSuccessUrlMobile(e.target.value)}
+						type="text"
+						value={checkoutSuccessUrl}
+					/>
+				</div>
+				<div className="col-12">
+					<Inputs
+						label="Checkout Failure (Mobile)"
+						onChange={(e) => setCheckoutFailureUrlMobile(e.target.value)}
 						type="text"
 						value={checkoutFailureUrl}
 					/>
