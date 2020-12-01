@@ -65,8 +65,8 @@ const HomePage = () => {
 			test_secret_key: testSecretKey,
 			webhook_secret_key: webhookSecretKey,
 			checkout_failure_url: checkoutFailureUrlWeb,
-      checkout_success_url: checkoutSuccessUrlWeb,
-      checkout_failure_url_mobile: checkoutFailureUrlMobile,
+			checkout_success_url: checkoutSuccessUrlWeb,
+			checkout_failure_url_mobile: checkoutFailureUrlMobile,
 			checkout_success_url_mobile: checkoutSuccessUrlMobile,
 		};
 

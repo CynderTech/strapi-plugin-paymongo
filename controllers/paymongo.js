@@ -69,7 +69,7 @@ module.exports = {
 	},
 
 	createSource: async (ctx, next) => {
-		const { amount, type } = ctx.request.body;
+		const { amount, platform, type } = ctx.request.body;
 		const validTypes = ['gcash', 'grab_pay'];
 
 		if (!validTypes.includes(type)) {
@@ -89,7 +89,8 @@ module.exports = {
 		try {
 			const result = await strapi.plugins.paymongo.services.paymongo.createSource(
 				amount,
-				type,
+        type,
+        platform,
 			);
 			ctx.send(result.data);
 		} catch (err) {

@@ -53,10 +53,12 @@ module.exports = {
 
 		return result;
 	},
-	createSource: async (amount, type) => {
+	createSource: async (amount, type, platform = 'web') => {
 		const {
-			checkout_failure_url: checkoutFailureUrl,
-			checkout_success_url: checkoutSuccessUrl,
+      checkout_failure_url: checkoutFailureUrlWeb,
+      checkout_failure_url_mobile: checkoutFailureUrlMobile,
+      checkout_success_url: checkoutSuccessUrlWeb,
+      checkout_success_url_mobile: checkoutSuccessUrlMobile,
 		} = await strapi
 			.store({
 				environment: '',
@@ -70,8 +72,8 @@ module.exports = {
 			amount: amount * 100,
 			currency: 'PHP',
 			redirect: {
-				success: checkoutSuccessUrl,
-				failed: checkoutFailureUrl,
+				success: platform === 'web' ? checkoutSuccessUrlWeb : checkoutSuccessUrlMobile,
+				failed: platform === 'web' ? checkoutFailureUrlMobile : checkoutFailureUrlMobile,
 			},
 		});
 
