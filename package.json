@@ -1,23 +1,36 @@
 {
   "name": "strapi-plugin-paymongo",
-  "version": "0.0.0",
-  "description": "This is the description of the plugin.",
+  "version": "1.0.0",
+  "description": "Strapi plugin for Paymongo - Community Edition",
   "strapi": {
     "name": "paymongo",
     "icon": "plug",
-    "description": "Description of paymongo plugin."
+    "description": "A Strapi plugin to interface with Paymongo API"
   },
-  "dependencies": {},
+  "dependencies": {
+    "paymongo-client": "^1.0.1"
+  },
   "author": {
-    "name": "A Strapi developer",
-    "email": "",
-    "url": ""
+    "name": "Cyndertech",
+    "email": "plugins@cynder.io",
+    "url": "https://cynder.io"
+  },
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/CynderTech/strapi-plugin-paymongo.git"
+  },
+  "bugs": {
+    "url" : "https://github.com/CynderTech/strapi-plugin-paymongo/issues",
+    "email" : "plugins@cynder.io"
   },
   "maintainers": [
     {
-      "name": "A Strapi developer",
-      "email": "",
-      "url": ""
+      "name": "Micah Andrew Bule",
+      "email": "mico@cynder.io"
+    },
+    {
+      "name": "Breech Alcres Paul Oracion",
+      "email": "breech@cynder.io"
     }
   ],
   "engines": {

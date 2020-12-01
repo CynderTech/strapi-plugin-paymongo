@@ -4,10 +4,9 @@
  * @description: A set of functions similar to controller's actions to avoid code duplication.
  */
 
-const axios = require('axios');
-const crypto = require('crypto');
+const Paymongo = require('paymongo-client').default;
 
-const getHeaders = async (useSecret = true) => {
+const getKeys = async () => {
 	const settings = await strapi
 		.store({
 			environment: '',
@@ -22,36 +21,27 @@ const getHeaders = async (useSecret = true) => {
 
 	const getKey = (identifier) => settings[`${mode}_${identifier}_key`];
 
-	const headers = {
-		Accept: 'application/json',
-		'Content-Type': 'application/json',
-		Authorization: `Basic ${Buffer.from(`${getKey(useSecret ? 'secret' : 'public')}:`).toString(
-			'base64',
-		)}`,
+	return {
+		public_key: getKey('public'),
+		secret_key: getKey('secret'),
 	};
-
-	return headers;
 };
 
-const constructPayload = (attributes) => ({
-	data: { attributes },
-});
+const getClient = async () => {
+	const { public_key: publicKey, secret_key: secretKey } = await getKeys();
+
+	const client = new Paymongo(publicKey, secretKey);
+
+	return client;
+};
 
 module.exports = {
 	createPaymentIntent: async (amount) => {
-		const payload = constructPayload({
-			amount: amount * 100,
-			payment_method_allowed: ['card'],
-			currency: 'PHP',
-		});
+		const client = await getClient();
 
-		const result = await axios.post(
-			`${process.env.PAYMONGO_BASE_URL}/payment_intents`,
-			payload,
-			{ headers: await getHeaders() },
-		);
+		const { body } = await client.createPaymentIntent(amount);
 
-		return result;
+		return body;
 	},
 	createSource: async (amount, type) => {
 		const {
@@ -65,50 +55,37 @@ module.exports = {
 				key: 'settings',
 			})
 			.get();
-		const payload = constructPayload({
+
+		const client = await getClient();
+
+		const { body } = await client.createSource(
+			amount,
 			type,
-			amount: amount * 100,
-			currency: 'PHP',
-			redirect: {
-				success: checkoutSuccessUrl,
-				failed: checkoutFailureUrl,
-			},
-		});
+			checkoutSuccessUrl,
+			checkoutFailureUrl,
+		);
 
-		const result = await axios.post(`${process.env.PAYMONGO_BASE_URL}/sources`, payload, {
-			headers: await getHeaders(),
-		});
-
-		return result;
+		return body;
 	},
 
 	/** https://developers.paymongo.com/reference#create-a-payment */
 	createPayment: async (amount, sourceId, paymentId) => {
-		const payload = constructPayload({
+		const client = await getClient();
+
+		/** Need to change description to a setting at some point */
+		const { body } = await client.createPayment(
 			amount,
-			description: `Ramen Kuroda - ${paymentId}`, // need to change this to a setting at some point,
-			currency: 'PHP',
-			source: {
-				id: sourceId,
-				type: 'source',
-			},
-		});
+			sourceId,
+			`Ramen Kuroda - ${paymentId}`,
+		);
 
-		const result = await axios.post(`${process.env.PAYMONGO_BASE_URL}/payments`, payload, {
-			headers: await getHeaders(),
-		});
-
-		return result;
+		return body;
 	},
 
 	verifyWebhook: async (headers, payload) => {
 		const paymongoHeader = headers['paymongo-signature'];
 
 		if (!paymongoHeader) return false;
-
-		const [timestamp, testSig, liveSig] = paymongoHeader.split(',');
-
-		if (!timestamp || !testSig || !liveSig) return false;
 
 		const { test_mode: testMode, webhook_secret_key: webhookSecretKey } = await strapi
 			.store({
@@ -119,13 +96,11 @@ module.exports = {
 			})
 			.get();
 
-		const signatureComposition = `${timestamp.slice(2)}.${payload}`;
-		const hmac = crypto.createHmac('sha256', webhookSecretKey);
-		hmac.update(signatureComposition, 'utf8');
-		const signature = hmac.digest('hex');
-
-		const sigToCompare = testMode ? testSig.slice(3) : liveSig.slice(3);
-
-		return signature === sigToCompare;
+		return Paymongo.verifyWebhook(
+			webhookSecretKey,
+			paymongoHeader,
+			payload,
+			testMode ? 'test' : 'live',
+		);
 	},
 };
