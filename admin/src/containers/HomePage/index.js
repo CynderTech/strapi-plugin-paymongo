@@ -17,10 +17,10 @@ const HomePage = () => {
 	const [testPublicKey, setTestPublicKey] = useState('');
 	const [testSecretKey, setTestSecretKey] = useState('');
 	const [webhookSecretKey, setWebhookSecretKey] = useState('');
-	const [checkoutSuccessUrl, setCheckoutSuccessUrlWeb] = useState('');
-  const [checkoutFailureUrl, setCheckoutFailureUrlWeb] = useState('');
-  const [checkoutSuccessUrl, setCheckoutSuccessUrlMobile] = useState('');
-	const [checkoutFailureUrl, setCheckoutFailureUrlMobile] = useState('');
+	const [checkoutSuccessUrlWeb, setCheckoutSuccessUrlWeb] = useState('');
+  const [checkoutFailureUrlWeb, setCheckoutFailureUrlWeb] = useState('');
+  const [checkoutSuccessUrlMobile, setCheckoutSuccessUrlMobile] = useState('');
+	const [checkoutFailureUrlMobile, setCheckoutFailureUrlMobile] = useState('');
 
 	useEffect(() => {
 		const querySettings = async () => {
@@ -152,7 +152,7 @@ const HomePage = () => {
 						label="Checkout Success (Web)"
 						onChange={(e) => setCheckoutSuccessUrlWeb(e.target.value)}
 						type="text"
-						value={checkoutSuccessUrl}
+						value={checkoutSuccessUrlWeb}
 					/>
 				</div>
 				<div className="col-12">
@@ -160,7 +160,7 @@ const HomePage = () => {
 						label="Checkout Failure (Web)"
 						onChange={(e) => setCheckoutFailureUrlWeb(e.target.value)}
 						type="text"
-						value={checkoutFailureUrl}
+						value={checkoutFailureUrlWeb}
 					/>
 				</div>
         <div className="col-12">
@@ -168,7 +168,7 @@ const HomePage = () => {
 						label="Checkout Success (Mobile)"
 						onChange={(e) => setCheckoutSuccessUrlMobile(e.target.value)}
 						type="text"
-						value={checkoutSuccessUrl}
+						value={checkoutSuccessUrlMobile}
 					/>
 				</div>
 				<div className="col-12">
@@ -176,7 +176,7 @@ const HomePage = () => {
 						label="Checkout Failure (Mobile)"
 						onChange={(e) => setCheckoutFailureUrlMobile(e.target.value)}
 						type="text"
-						value={checkoutFailureUrl}
+						value={checkoutFailureUrlMobile}
 					/>
 				</div>
 			</div>
