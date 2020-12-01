@@ -15,6 +15,14 @@
     "email": "plugins@cynder.io",
     "url": "https://cynder.io"
   },
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/CynderTech/strapi-plugin-paymongo.git"
+  },
+  "bugs": {
+    "url" : "https://github.com/CynderTech/strapi-plugin-paymongo/issues",
+    "email" : "plugins@cynder.io"
+  },
   "maintainers": [
     {
       "name": "Micah Andrew Bule",
