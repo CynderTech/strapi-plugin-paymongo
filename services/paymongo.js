@@ -6,8 +6,9 @@
 
 const axios = require('axios');
 const crypto = require('crypto');
+const Paymongo = require('paymongo-client');
 
-const getHeaders = async (useSecret = true) => {
+const getKeys = async () => {
 	const settings = await strapi
 		.store({
 			environment: '',
@@ -17,41 +18,28 @@ const getHeaders = async (useSecret = true) => {
 		})
 		.get();
 
-	const { test_mode: testMode } = settings;
-	const mode = testMode ? 'test' : 'live';
+    const { test_mode: testMode } = settings;
+    const mode = testMode ? 'test' : 'live';
+    
+    const getKey = (identifier) => settings[`${mode}_${identifier}_key`];
 
-	const getKey = (identifier) => settings[`${mode}_${identifier}_key`];
-
-	const headers = {
-		Accept: 'application/json',
-		'Content-Type': 'application/json',
-		Authorization: `Basic ${Buffer.from(`${getKey(useSecret ? 'secret' : 'public')}:`).toString(
-			'base64',
-		)}`,
-	};
-
-	return headers;
+	return {
+    public_key: getKey('public'),
+    secret_key: getKey('secret'),
+  };
 };
-
-const constructPayload = (attributes) => ({
-	data: { attributes },
-});
 
 module.exports = {
 	createPaymentIntent: async (amount) => {
-		const payload = constructPayload({
-			amount: amount * 100,
-			payment_method_allowed: ['card'],
-			currency: 'PHP',
-		});
+    const { public_key: publicKey, secret_key: secretKey } = await getKeys();
 
-		const result = await axios.post(
-			`${process.env.PAYMONGO_BASE_URL}/payment_intents`,
-			payload,
-			{ headers: await getHeaders() },
-		);
+    const client = new Paymongo(publicKey, secretKey);
+    
+    const { body } = await client.createPaymentIntent(amount);
 
-		return result;
+    console.log(body);
+
+    return body;
 	},
 	createSource: async (amount, type) => {
 		const {
