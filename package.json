@@ -8,7 +8,8 @@
     "description": "A Strapi plugin to interface with Paymongo API"
   },
   "dependencies": {
-    "paymongo-client": "^1.0.1"
+    "koa-body": "^4.2.0",
+    "paymongo-client": "^1.0.2"
   },
   "author": {
     "name": "Cyndertech",
@@ -16,12 +17,12 @@
     "url": "https://cynder.io"
   },
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/CynderTech/strapi-plugin-paymongo.git"
+    "type": "git",
+    "url": "https://github.com/CynderTech/strapi-plugin-paymongo.git"
   },
   "bugs": {
-    "url" : "https://github.com/CynderTech/strapi-plugin-paymongo/issues",
-    "email" : "plugins@cynder.io"
+    "url": "https://github.com/CynderTech/strapi-plugin-paymongo/issues",
+    "email": "plugins@cynder.io"
   },
   "maintainers": [
     {
