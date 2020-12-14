@@ -36,10 +36,10 @@ const getClient = async () => {
 };
 
 module.exports = {
-	createPaymentIntent: async (amount) => {
-		const client = await getClient();
-
-		const { body } = await client.createPaymentIntent(amount);
+	createPaymentIntent: async (amount, description) => {
+    const client = await getClient();
+    
+		const { body } = await client.createPaymentIntent({ amount, description });
 
 		return body;
 	},

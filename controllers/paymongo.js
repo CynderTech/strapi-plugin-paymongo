@@ -38,7 +38,7 @@ module.exports = {
 	},
 
 	createPaymentIntent: async (ctx, next) => {
-		const { amount } = ctx.request.body;
+		const { amount, description } = ctx.request.body;
 
 		if (!amount) {
 			ctx.status = 400;
@@ -51,12 +51,14 @@ module.exports = {
 			};
 			await next();
 			return;
-		}
+    }
+    
+    const intentArgs = [amount];
+
+    if (description) intentArgs.push(description);
 
 		try {
-			const result = await strapi.plugins.paymongo.services.paymongo.createPaymentIntent(
-				amount,
-			);
+			const result = await strapi.plugins.paymongo.services.paymongo.createPaymentIntent(...intentArgs);
 			ctx.send(result);
 		} catch (err) {
 			const { errors } = err.response.data;
