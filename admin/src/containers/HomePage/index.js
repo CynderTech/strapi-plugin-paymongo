@@ -17,14 +17,18 @@ const HomePage = () => {
 	const [testPublicKey, setTestPublicKey] = useState('');
 	const [testSecretKey, setTestSecretKey] = useState('');
 	const [webhookSecretKey, setWebhookSecretKey] = useState('');
-	const [checkoutSuccessUrl, setCheckoutSuccessUrl] = useState('');
-	const [checkoutFailureUrl, setCheckoutFailureUrl] = useState('');
+	const [checkoutSuccessUrlWeb, setCheckoutSuccessUrlWeb] = useState('');
+  const [checkoutFailureUrlWeb, setCheckoutFailureUrlWeb] = useState('');
+  const [checkoutSuccessUrlMobile, setCheckoutSuccessUrlMobile] = useState('');
+	const [checkoutFailureUrlMobile, setCheckoutFailureUrlMobile] = useState('');
 
 	useEffect(() => {
 		const querySettings = async () => {
 			const {
 				checkout_failure_url: retrievedCheckoutFailureUrl,
-				checkout_success_url: retrievedCheckoutSuccessUrl,
+        checkout_failure_url_mobile: retrievedCheckoutFailureUrlMobile,
+        checkout_success_url: retrievedCheckoutSuccessUrl,
+        checkout_success_url_mobile: retrievedCheckoutSuccessUrlMobile,
 				live_public_key: retrievedLivePublicKey,
 				live_secret_key: retrievedLiveSecretKey,
 				test_mode: retrievedTestMode,
@@ -41,8 +45,10 @@ const HomePage = () => {
 			setTestSecretKey(retrievedTestSecretKey || '');
 			setTestMode(retrievedTestMode);
 			setWebhookSecretKey(retrievedWebhookSecretKey || '');
-			setCheckoutSuccessUrl(retrievedCheckoutSuccessUrl || '');
-			setCheckoutFailureUrl(retrievedCheckoutFailureUrl || '');
+			setCheckoutSuccessUrlWeb(retrievedCheckoutSuccessUrl || '');
+      setCheckoutFailureUrlWeb(retrievedCheckoutFailureUrl || '');
+      setCheckoutSuccessUrlMobile(retrievedCheckoutSuccessUrlMobile || '');
+			setCheckoutFailureUrlMobile(retrievedCheckoutFailureUrlMobile || '');
 		};
 
 		setLoading(true);
@@ -58,8 +64,10 @@ const HomePage = () => {
 			test_public_key: testPublicKey,
 			test_secret_key: testSecretKey,
 			webhook_secret_key: webhookSecretKey,
-			checkout_failure_url: checkoutFailureUrl,
-			checkout_success_url: checkoutSuccessUrl,
+			checkout_failure_url: checkoutFailureUrlWeb,
+			checkout_success_url: checkoutSuccessUrlWeb,
+			checkout_failure_url_mobile: checkoutFailureUrlMobile,
+			checkout_success_url_mobile: checkoutSuccessUrlMobile,
 		};
 
 		try {
@@ -143,18 +151,34 @@ const HomePage = () => {
 				</div>
 				<div className="col-12">
 					<Inputs
-						label="Checkout Success"
-						onChange={(e) => setCheckoutSuccessUrl(e.target.value)}
+						label="Checkout Success (Web)"
+						onChange={(e) => setCheckoutSuccessUrlWeb(e.target.value)}
 						type="text"
-						value={checkoutSuccessUrl}
+						value={checkoutSuccessUrlWeb}
 					/>
 				</div>
 				<div className="col-12">
 					<Inputs
-						label="Checkout Failure"
-						onChange={(e) => setCheckoutFailureUrl(e.target.value)}
+						label="Checkout Failure (Web)"
+						onChange={(e) => setCheckoutFailureUrlWeb(e.target.value)}
 						type="text"
-						value={checkoutFailureUrl}
+						value={checkoutFailureUrlWeb}
+					/>
+				</div>
+        <div className="col-12">
+					<Inputs
+						label="Checkout Success (Mobile)"
+						onChange={(e) => setCheckoutSuccessUrlMobile(e.target.value)}
+						type="text"
+						value={checkoutSuccessUrlMobile}
+					/>
+				</div>
+				<div className="col-12">
+					<Inputs
+						label="Checkout Failure (Mobile)"
+						onChange={(e) => setCheckoutFailureUrlMobile(e.target.value)}
+						type="text"
+						value={checkoutFailureUrlMobile}
 					/>
 				</div>
 			</div>
