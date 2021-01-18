@@ -43,10 +43,12 @@ module.exports = {
 
 		return body;
 	},
-	createSource: async (amount, type) => {
+	createSource: async (amount, type, platform = 'web') => {
 		const {
-			checkout_failure_url: checkoutFailureUrl,
-			checkout_success_url: checkoutSuccessUrl,
+      checkout_failure_url: checkoutFailureUrlWeb,
+      checkout_failure_url_mobile: checkoutFailureUrlMobile,
+      checkout_success_url: checkoutSuccessUrlWeb,
+      checkout_success_url_mobile: checkoutSuccessUrlMobile,
 		} = await strapi
 			.store({
 				environment: '',
@@ -56,7 +58,10 @@ module.exports = {
 			})
 			.get();
 
-		const client = await getClient();
+    const client = await getClient();
+    
+    const checkoutSuccessUrl = platform === 'web' ? checkoutSuccessUrlWeb : checkoutSuccessUrlMobile;
+    const checkoutFailureUrl = platform === 'web' ? checkoutFailureUrlWeb : checkoutFailureUrlMobile;
 
 		const { body } = await client.createSource(
 			amount,
