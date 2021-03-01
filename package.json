@@ -1,6 +1,6 @@
 {
   "name": "strapi-plugin-paymongo",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Strapi plugin for Paymongo - Community Edition",
   "strapi": {
     "name": "paymongo",
