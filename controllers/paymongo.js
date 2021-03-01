@@ -141,6 +141,7 @@ module.exports = {
 		if (status === 'chargeable') {
 			/** Query all payments for now, Strapi can't filter components */
 			const payments = await strapi.query('payment').find({
+        _limit: -1,
 				paymentType: sourceType,
 			});
 
