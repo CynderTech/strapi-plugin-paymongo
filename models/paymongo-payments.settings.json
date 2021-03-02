@@ -1,0 +1,30 @@
+{
+	"kind": "collectionType",
+	"collectionName": "payment",
+	"info": {
+		"name": "PayMongo Payments"
+	},
+	"options": {
+		"increments": true,
+		"timestamps": true
+	},
+	"attributes": {
+    "type": {
+      "type": "enumeration",
+      "enum": [
+        "gcash",
+        "grab_pay",
+        "cc"
+      ]
+    },
+		"originId": {
+      "type": "string"
+    },
+    "paymentId": {
+      "type": "string"
+    },
+    "rawResponse": {
+      "type": "json"
+    }
+	}
+}
