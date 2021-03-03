@@ -6,6 +6,9 @@
 
 const unparsed = require('koa-body/unparsed');
 
+const pluginPkg = require('../package.json');
+const { name: pluginName } = pluginPkg.strapi;
+
 module.exports = {
 	getSettings: async (ctx) => {
 		const pluginSettingsStore = await strapi.store({
@@ -53,12 +56,16 @@ module.exports = {
 			return;
     }
 
-    const newPayment = await strapi.query('paymongo-payments', 'paymongo').create({});
+    const newPayment = await strapi.query('paymongo-payments', pluginName).create({});
 
     const payload = { amount, paymentId: newPayment.id };
 
 		try {
 			const result = await strapi.plugins.paymongo.services.paymongo.createPaymentIntent(payload);
+      const { data: { id: paymentIntentId } } = result;
+
+      strapi.query('paymongo-payments', pluginName).update({ id: newPayment.id }, { paymentIntentId });
+
 			ctx.send(result);
 		} catch (err) {
 			const { errors } = err.response.data;
