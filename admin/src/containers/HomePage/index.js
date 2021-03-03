@@ -8,50 +8,19 @@ import React, { memo, useEffect, useState } from 'react';
 import { Button, Label, Padded, Text, Toggle } from '@buffetjs/core';
 import { Header, Inputs } from '@buffetjs/custom';
 import { request } from 'strapi-helper-plugin';
+import { settingsValue } from '../../../../constants';
 
 const HomePage = () => {
 	const [loading, setLoading] = useState(false);
-	const [testMode, setTestMode] = useState(true);
-	const [livePublicKey, setLivePublicKey] = useState('');
-	const [liveSecretKey, setLiveSecretKey] = useState('');
-	const [testPublicKey, setTestPublicKey] = useState('');
-	const [testSecretKey, setTestSecretKey] = useState('');
-	const [webhookSecretKey, setWebhookSecretKey] = useState('');
-  const [use3dsRedirect, setUse3dsRedirect] = useState(false);
-	const [checkoutSuccessUrlWeb, setCheckoutSuccessUrlWeb] = useState('');
-  const [checkoutFailureUrlWeb, setCheckoutFailureUrlWeb] = useState('');
-  const [checkoutSuccessUrlMobile, setCheckoutSuccessUrlMobile] = useState('');
-	const [checkoutFailureUrlMobile, setCheckoutFailureUrlMobile] = useState('');
+  const [payload, setPayload] = useState(settingsValue);
 
 	useEffect(() => {
 		const querySettings = async () => {
-			const {
-				checkout_failure_url: retrievedCheckoutFailureUrl,
-        checkout_failure_url_mobile: retrievedCheckoutFailureUrlMobile,
-        checkout_success_url: retrievedCheckoutSuccessUrl,
-        checkout_success_url_mobile: retrievedCheckoutSuccessUrlMobile,
-				live_public_key: retrievedLivePublicKey,
-				live_secret_key: retrievedLiveSecretKey,
-				test_mode: retrievedTestMode,
-				test_public_key: retrievedTestPublicKey,
-				test_secret_key: retrievedTestSecretKey,
-        use_3ds_redirect: retrievedUse3dsRedirect,
-				webhook_secret_key: retrievedWebhookSecretKey,
-			} = await request('/paymongo/settings');
+			const settings = await request('/paymongo/settings');
 
 			setLoading(false);
 
-			setLivePublicKey(retrievedLivePublicKey || '');
-			setLiveSecretKey(retrievedLiveSecretKey || '');
-			setTestPublicKey(retrievedTestPublicKey || '');
-			setTestSecretKey(retrievedTestSecretKey || '');
-			setTestMode(retrievedTestMode);
-			setWebhookSecretKey(retrievedWebhookSecretKey || '');
-			setCheckoutSuccessUrlWeb(retrievedCheckoutSuccessUrl || '');
-      setCheckoutFailureUrlWeb(retrievedCheckoutFailureUrl || '');
-      setCheckoutSuccessUrlMobile(retrievedCheckoutSuccessUrlMobile || '');
-			setCheckoutFailureUrlMobile(retrievedCheckoutFailureUrlMobile || '');
-      setUse3dsRedirect(retrievedUse3dsRedirect || false);
+			setPayload(settings);
 		};
 
 		setLoading(true);
@@ -59,21 +28,14 @@ const HomePage = () => {
 		querySettings();
 	}, []);
 
-	const handleSubmit = async () => {
-		const payload = {
-			live_public_key: livePublicKey,
-			live_secret_key: liveSecretKey,
-			test_mode: testMode,
-			test_public_key: testPublicKey,
-			test_secret_key: testSecretKey,
-      use_3ds_redirect: use3dsRedirect,
-			webhook_secret_key: webhookSecretKey,
-			checkout_failure_url: checkoutFailureUrlWeb,
-			checkout_success_url: checkoutSuccessUrlWeb,
-			checkout_failure_url_mobile: checkoutFailureUrlMobile,
-			checkout_success_url_mobile: checkoutSuccessUrlMobile,
-		};
+  const handleChange = (key, value) => {
+    setPayload({
+      ...payload,
+      [key]: value,
+    });
+  };
 
+	const handleSubmit = async () => {
 		try {
 			const { ok } = await request('/paymongo/settings', {
 				method: 'POST',
@@ -99,44 +61,64 @@ const HomePage = () => {
 						</Text>
 					</Padded>
 				</div>
+        <div className="col-12">
+					<Inputs
+						label="Company Name"
+						onChange={(e) => {
+              handleChange('company_name', e.target.value);
+            }}
+						type="text"
+						value={payload.company_name}
+					/>
+				</div>
 				<div className="col-12">
 					<Inputs
 						label="Live Public Key"
-						onChange={(e) => setLivePublicKey(e.target.value)}
+						onChange={(e) => {
+              handleChange('live_public_key', e.target.value);
+            }}
 						type="text"
-						value={livePublicKey}
+						value={payload.live_public_key}
 					/>
 				</div>
 				<div className="col-12">
 					<Inputs
 						label="Live Secret Key"
-						onChange={(e) => setLiveSecretKey(e.target.value)}
+						onChange={(e) => {
+              handleChange('live_secret_key', e.target.value)
+            }}
 						type="text"
-						value={liveSecretKey}
+						value={payload.live_secret_key}
 					/>
 				</div>
 				<div className="col-12">
 					<Inputs
 						label="Test Public Key"
-						onChange={(e) => setTestPublicKey(e.target.value)}
+						onChange={(e) => {
+              handleChange('test_public_key', e.target.value);
+            }}
 						type="text"
-						value={testPublicKey}
+						value={payload.test_public_key}
 					/>
 				</div>
 				<div className="col-12">
 					<Inputs
 						label="Test Secret Key"
-						onChange={(e) => setTestSecretKey(e.target.value)}
+						onChange={(e) => {
+              handleChange('test_secret_key', e.target.value);
+            }}
 						type="text"
-						value={testSecretKey}
+						value={payload.test_secret_key}
 					/>
 				</div>
         <div className="col-12 mb-5">
           <Label htmlFor="3dsRedirect">Use Redirect for 3DS</Label>
           <Toggle
             name="3dsRedirect"
-            onChange={(e) => setUse3dsRedirect(e.target.value)}
-            value={use3dsRedirect}
+            onChange={(e) => {
+              handleChange('use_3ds_redirect', e.target.value)
+            }}
+            value={payload.use_3ds_redirect}
           />
         </div>
 				<div className="col-12">
@@ -149,9 +131,11 @@ const HomePage = () => {
 				<div className="col-12">
 					<Inputs
 						label="Webhook Signing Secret"
-						onChange={(e) => setWebhookSecretKey(e.target.value)}
+						onChange={(e) => {
+              handleChange('webhook_secret_key', e.target.value);
+            }}
 						type="text"
-						value={webhookSecretKey}
+						value={payload.webhook_secret_key}
 					/>
 				</div>
 				<div className="col-12">
@@ -164,33 +148,41 @@ const HomePage = () => {
 				<div className="col-12">
 					<Inputs
 						label="Checkout Success (Web)"
-						onChange={(e) => setCheckoutSuccessUrlWeb(e.target.value)}
+						onChange={(e) => {
+              handleChange('checkout_success_url', e.target.value);
+            }}
 						type="text"
-						value={checkoutSuccessUrlWeb}
+						value={payload.checkout_success_url}
 					/>
 				</div>
 				<div className="col-12">
 					<Inputs
 						label="Checkout Failure (Web)"
-						onChange={(e) => setCheckoutFailureUrlWeb(e.target.value)}
+						onChange={(e) => {
+              handleChange('checkout_failure_url', e.target.value);
+            }}
 						type="text"
-						value={checkoutFailureUrlWeb}
+						value={payload.checkout_failure_url}
 					/>
 				</div>
         <div className="col-12">
 					<Inputs
 						label="Checkout Success (Mobile)"
-						onChange={(e) => setCheckoutSuccessUrlMobile(e.target.value)}
+						onChange={(e) => {
+              handleChange('checkout_success_url_mobile', e.target.value);
+            }}
 						type="text"
-						value={checkoutSuccessUrlMobile}
+						value={payload.checkout_success_url_mobile}
 					/>
 				</div>
 				<div className="col-12">
 					<Inputs
 						label="Checkout Failure (Mobile)"
-						onChange={(e) => setCheckoutFailureUrlMobile(e.target.value)}
+						onChange={(e) => {
+              handleChange('checkout_failure_url_mobile', e.target.value);
+            }}
 						type="text"
-						value={checkoutFailureUrlMobile}
+						value={payload.checkout_failure_url_mobile}
 					/>
 				</div>
 			</div>
@@ -225,8 +217,8 @@ const HomePage = () => {
 								<Label htmlFor="isTestMode">Test Mode</Label>
 								<Toggle
 									name="isTestMode"
-									onChange={(e) => setTestMode(e.target.value)}
-									value={testMode}
+									onChange={(e) => handleChange('test_mode', e.target.value)}
+									value={payload.test_mode}
 								/>
 							</div>
 						</div>
