@@ -36,10 +36,25 @@ const getClient = async () => {
 };
 
 module.exports = {
-	createPaymentIntent: async (amount, description) => {
+	createPaymentIntent: async ({ paymentId, ...payload }) => {
     const client = await getClient();
+
+    const pluginStore = await strapi
+      .store({
+        environment: '',
+        type: 'plugin',
+        name: 'paymongo',
+        key: 'settings',
+      });
     
-		const { body } = await client.createPaymentIntent({ amount, description });
+    const {
+      company_name: companyName,
+    } = pluginStore.get();
+    
+		const { body } = await client.createPaymentIntent({
+      ...payload,
+      description: `${companyName} - ${paymentId}`,
+    });
 
 		return body;
 	},

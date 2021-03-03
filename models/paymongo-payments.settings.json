@@ -9,6 +9,9 @@
 		"timestamps": true
 	},
 	"attributes": {
+    "paymentId": {
+      "type": "string"
+    },
     "type": {
       "type": "enumeration",
       "enum": [
@@ -17,10 +20,10 @@
         "cc"
       ]
     },
-		"originId": {
+		"paymentIntentId": {
       "type": "string"
     },
-    "paymentId": {
+    "sourceId": {
       "type": "string"
     },
     "rawResponse": {
