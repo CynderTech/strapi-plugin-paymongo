@@ -17,6 +17,7 @@ const HomePage = () => {
 	const [testPublicKey, setTestPublicKey] = useState('');
 	const [testSecretKey, setTestSecretKey] = useState('');
 	const [webhookSecretKey, setWebhookSecretKey] = useState('');
+  const [use3dsRedirect, setUse3dsRedirect] = useState(false);
 	const [checkoutSuccessUrlWeb, setCheckoutSuccessUrlWeb] = useState('');
   const [checkoutFailureUrlWeb, setCheckoutFailureUrlWeb] = useState('');
   const [checkoutSuccessUrlMobile, setCheckoutSuccessUrlMobile] = useState('');
@@ -34,6 +35,7 @@ const HomePage = () => {
 				test_mode: retrievedTestMode,
 				test_public_key: retrievedTestPublicKey,
 				test_secret_key: retrievedTestSecretKey,
+        use_3ds_redirect: retrievedUse3dsRedirect,
 				webhook_secret_key: retrievedWebhookSecretKey,
 			} = await request('/paymongo/settings');
 
@@ -49,6 +51,7 @@ const HomePage = () => {
       setCheckoutFailureUrlWeb(retrievedCheckoutFailureUrl || '');
       setCheckoutSuccessUrlMobile(retrievedCheckoutSuccessUrlMobile || '');
 			setCheckoutFailureUrlMobile(retrievedCheckoutFailureUrlMobile || '');
+      setUse3dsRedirect(retrievedUse3dsRedirect || false);
 		};
 
 		setLoading(true);
@@ -63,6 +66,7 @@ const HomePage = () => {
 			test_mode: testMode,
 			test_public_key: testPublicKey,
 			test_secret_key: testSecretKey,
+      use_3ds_redirect: use3dsRedirect,
 			webhook_secret_key: webhookSecretKey,
 			checkout_failure_url: checkoutFailureUrlWeb,
 			checkout_success_url: checkoutSuccessUrlWeb,
@@ -127,6 +131,14 @@ const HomePage = () => {
 						value={testSecretKey}
 					/>
 				</div>
+        <div className="col-12 mb-5">
+          <Label htmlFor="3dsRedirect">Use Redirect for 3DS</Label>
+          <Toggle
+            name="3dsRedirect"
+            onChange={(e) => setUse3dsRedirect(e.target.value)}
+            value={use3dsRedirect}
+          />
+        </div>
 				<div className="col-12">
 					<Padded bottom>
 						<Text fontSize="lg" fontWeight="bold">

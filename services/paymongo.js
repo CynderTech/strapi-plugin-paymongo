@@ -43,6 +43,33 @@ module.exports = {
 
 		return body;
 	},
+
+  attachPaymentIntent: async (intentId, methodId) => {
+    const attachMethodData = { intentId, methodId };
+
+    const pluginStore = await strapi
+      .store({
+        environment: '',
+        type: 'plugin',
+        name: 'paymongo',
+        key: 'settings',
+      });
+    
+    const {
+      use_3ds_redirect: use3dsRedirect,
+    } = pluginStore.get();
+
+    if (use3dsRedirect) {
+      const { url: serverUrl } = strapi.config.server;
+
+      attachMethodData.redirect = `${serverUrl}/process-3ds-redirect`;
+    }
+
+    const { body } = await client.attachPaymentIntent(attachMethodData);
+
+    return body;
+  },
+
 	createSource: async (amount, type, platform = 'web') => {
 		const {
       checkout_failure_url: checkoutFailureUrlWeb,
