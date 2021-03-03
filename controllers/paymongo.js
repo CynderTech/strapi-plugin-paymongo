@@ -77,6 +77,22 @@ module.exports = {
 		}
 	},
 
+  attachPaymentIntent: async (ctx, next) => {
+    const { methodId, intentId } = ctx.request.body;
+
+    try {
+      const result = await strapi.plugins.paymongo.services.paymongo.attachPaymentIntent({ intentId, methodId });
+      ctx.send(result);
+    } catch (err) {
+      const { errors } = err.response.data;
+
+			ctx.status = err.response.status;
+			ctx.body = { errors };
+
+			await next();
+    }
+  },
+
 	createSource: async (ctx, next) => {
 		const { amount, platform, type } = ctx.request.body;
 		const validTypes = ['gcash', 'grab_pay'];

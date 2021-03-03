@@ -28,6 +28,14 @@
     },
     "rawResponse": {
       "type": "json"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "pending",
+        "success",
+        "fail"
+      ]
     }
 	}
 }
