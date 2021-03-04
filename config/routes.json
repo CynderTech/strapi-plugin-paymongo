@@ -47,6 +47,14 @@
       "config": {
         "policies": []
       }
+    },
+    {
+      "method": "GET",
+      "path": "/process-3ds-redirect",
+      "handler": "paymongo.process3dsRedirect",
+      "config": {
+        "policies": []
+      }
     }
   ]
 }

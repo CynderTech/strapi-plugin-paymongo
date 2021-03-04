@@ -6,6 +6,9 @@
 
 const Paymongo = require('paymongo-client').default;
 
+const pluginPkg = require('../package.json');
+const { name: pluginName } = pluginPkg.strapi;
+
 const getKeys = async () => {
 	const settings = await strapi
 		.store({
@@ -39,7 +42,7 @@ module.exports = {
 	createPaymentIntent: async ({ paymentId, ...payload }) => {
     const client = await getClient();
 
-    const pluginStore = await strapi
+    const pluginStore = strapi
       .store({
         environment: '',
         type: 'plugin',
@@ -49,7 +52,7 @@ module.exports = {
     
     const {
       company_name: companyName,
-    } = pluginStore.get();
+    } = await pluginStore.get();
     
 		const { body } = await client.createPaymentIntent({
       ...payload,
@@ -60,27 +63,41 @@ module.exports = {
 	},
 
   attachPaymentIntent: async (payload) => {
-    const pluginStore = await strapi
+    const client = await getClient();
+
+    const pluginStore = strapi
       .store({
         environment: '',
         type: 'plugin',
-        name: 'paymongo',
+        name: pluginName,
         key: 'settings',
       });
     
     const {
       use_3ds_redirect: use3dsRedirect,
-    } = pluginStore.get();
+    } = await pluginStore.get();
 
     const overrides = {};
 
     if (use3dsRedirect && typeof payload.redirect === 'undefined') {
       const { url: serverUrl } = strapi.config.server;
 
-      overrides.redirect = `${serverUrl}/paymongo/process-3ds-redirect`;
+      const payment = await strapi.query('paymongo-payments', pluginName).findOne({ paymentIntentId: payload.intentId });
+
+      if (payment && Object.keys(payment).length > 0) {
+        overrides.redirect = `${serverUrl || 'http://localhost:1337'}/paymongo/process-3ds-redirect?pid=${payment.paymentId}&vt=${payment.verificationToken}`;
+      }
     }
 
     const { body } = await client.attachPaymentIntent({ ...payload, ...overrides });
+
+    return body;
+  },
+
+  retrievePaymentIntent: async (intentId) => {
+    const client = await getClient();
+
+    const { body } = await client.retrievePaymentIntent(intentId);
 
     return body;
   },

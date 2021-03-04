@@ -35,7 +35,11 @@
         "pending",
         "success",
         "fail"
-      ]
+      ],
+      "default": "pending"
+    },
+    "verificationToken": {
+      "type": "string"
     }
 	}
 }

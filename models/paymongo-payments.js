@@ -5,6 +5,7 @@ module.exports = {
   lifecycles: {
     beforeCreate: async (data) => {
       data.paymentId = nanoid();
+      data.verificationToken = nanoid();
     },
   },
 };

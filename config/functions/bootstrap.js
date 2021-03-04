@@ -1,4 +1,4 @@
-const { settingsValue } = require('../../constants');
+const { SETTINGS } = require('../../constants');
 
 module.exports = async () => {
 	const pluginStore = strapi.store({
@@ -8,6 +8,6 @@ module.exports = async () => {
 	});
 
 	if (!(await pluginStore.get({ key: 'settings' }))) {
-		await pluginStore.set({ key: 'settings', value: settingsValue });
+		await pluginStore.set({ key: 'settings', value: SETTINGS });
 	}
 };

@@ -1,4 +1,4 @@
-const settingsValue = {
+const SETTINGS = {
   test_mode: true,
   company_name: null,
   live_public_key: null,
@@ -13,4 +13,11 @@ const settingsValue = {
   checkout_failure_url_mobile: null,
 };
 
-module.exports = { settingsValue };
+const PAYMENT_INTENT_STATUSES = {
+  AWAITING_PAYMENT_METHOD: 'awaiting_payment_method',
+  AWAITING_NEXT_ACTION: 'awaiting_next_action',
+  PROCESSING: 'processing',
+  SUCCEEDED: 'succeeded',
+};
+
+module.exports = { SETTINGS, PAYMENT_INTENT_STATUSES };

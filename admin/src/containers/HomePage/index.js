@@ -8,11 +8,11 @@ import React, { memo, useEffect, useState } from 'react';
 import { Button, Label, Padded, Text, Toggle } from '@buffetjs/core';
 import { Header, Inputs } from '@buffetjs/custom';
 import { request } from 'strapi-helper-plugin';
-import { settingsValue } from '../../../../constants';
+import { SETTINGS } from '../../../../constants';
 
 const HomePage = () => {
 	const [loading, setLoading] = useState(false);
-  const [payload, setPayload] = useState(settingsValue);
+  const [payload, setPayload] = useState(SETTINGS);
 
 	useEffect(() => {
 		const querySettings = async () => {
