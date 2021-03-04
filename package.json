@@ -8,7 +8,7 @@
     "description": "A Strapi plugin to interface with PayMongo API"
   },
   "scripts": {
-    "postinstall": "husky install",
+    "prepare": "husky install",
     "lint": "esw",
     "lint:watch": "npm run lint -- --watch",
     "pretest": "npm run lint"
