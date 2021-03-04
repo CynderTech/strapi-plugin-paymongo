@@ -20,4 +20,14 @@ const PAYMENT_INTENT_STATUSES = {
 	SUCCEEDED: 'succeeded',
 };
 
-module.exports = { SETTINGS, PAYMENT_INTENT_STATUSES };
+const PAYMONGO_PAYMENT_STATUSES = {
+	PENDING: 'pending',
+	FAILED: 'failed',
+	PAID: 'paid',
+};
+
+module.exports = {
+	SETTINGS,
+	PAYMENT_INTENT_STATUSES,
+	PAYMONGO_PAYMENT_STATUSES,
+};

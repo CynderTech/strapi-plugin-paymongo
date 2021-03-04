@@ -39,22 +39,26 @@ const getClient = async () => {
 	return client;
 };
 
+const getDefaultDescription = async (paymentId) => {
+	const pluginStore = strapi.store({
+		environment: '',
+		type: 'plugin',
+		name: pluginName,
+		key: 'settings',
+	});
+
+	const { company_name: companyName } = await pluginStore.get();
+
+	return `${companyName} - ${paymentId}`;
+};
+
 module.exports = {
 	createPaymentIntent: async ({ paymentId, ...payload }) => {
 		const client = await getClient();
 
-		const pluginStore = strapi.store({
-			environment: '',
-			type: 'plugin',
-			name: 'paymongo',
-			key: 'settings',
-		});
-
-		const { company_name: companyName } = await pluginStore.get();
-
 		const { body } = await client.createPaymentIntent({
 			...payload,
-			description: `${companyName} - ${paymentId}`,
+			description: await getDefaultDescription(paymentId),
 		});
 
 		return body;
@@ -137,12 +141,14 @@ module.exports = {
 	createPayment: async (amount, sourceId, paymentId) => {
 		const client = await getClient();
 
-		/** Need to change description to a setting at some point */
-		const { body } = await client.createPayment(
+		const { body } = await client.createPayment({
 			amount,
-			sourceId,
-			`Ramen Kuroda - ${paymentId}`,
-		);
+			description: await getDefaultDescription(paymentId),
+			source: {
+				id: sourceId,
+				type: 'source',
+			},
+		});
 
 		return body;
 	},

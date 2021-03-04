@@ -5,7 +5,10 @@
  */
 
 const unparsed = require('koa-body/unparsed');
-const { PAYMENT_INTENT_STATUSES } = require('../constants');
+const {
+	PAYMENT_INTENT_STATUSES,
+	PAYMONGO_PAYMENT_STATUSES,
+} = require('../constants');
 
 const pluginPkg = require('../package.json');
 
@@ -62,7 +65,7 @@ module.exports = {
 
 		const newPayment = await strapi
 			.query('paymongo-payments', pluginName)
-			.create({});
+			.create({ type: 'cc' });
 
 		const payload = { amount, paymentId: newPayment.paymentId };
 
@@ -80,7 +83,7 @@ module.exports = {
 
 			ctx.send(result);
 		} catch (err) {
-			const { errors } = err.response.data;
+			const { errors } = err.response.body;
 
 			ctx.status = err.response.status;
 			ctx.body = { errors };
@@ -125,10 +128,7 @@ module.exports = {
 
 			return ctx.send(result);
 		} catch (err) {
-			// eslint-disable-next-line no-console
-			console.log(err);
-
-			const { errors } = err.response.data;
+			const { errors } = err.response.body;
 
 			ctx.status = err.response.status;
 			ctx.body = { errors };
@@ -194,7 +194,7 @@ module.exports = {
 					{ id: payment.id },
 					{
 						status: 'success',
-						rawResponse: JSON.stringify(result),
+						rawResponse: result,
 					},
 				);
 
@@ -206,7 +206,7 @@ module.exports = {
 					.query('paymongo-payments', pluginName)
 					.update(
 						{ id: payment.id },
-						{ status: 'fail', rawResponse: JSON.stringify(result) },
+						{ status: 'fail', rawResponse: result },
 					);
 
 				return ctx.redirect(checkoutFailureUrl);
@@ -224,7 +224,7 @@ module.exports = {
 
 			return next();
 		} catch (err) {
-			const { errors } = err.response.data;
+			const { errors } = err.response.body;
 
 			ctx.status = err.response.status;
 			ctx.body = { errors };
@@ -256,9 +256,18 @@ module.exports = {
 				amount,
 				type,
 			);
+
+			const {
+				data: { id: sourceId },
+			} = result;
+
+			await strapi
+				.query('paymongo-payments', pluginName)
+				.create({ type, sourceId });
+
 			ctx.send(result);
 		} catch (err) {
-			const { errors } = err.response.data;
+			const { errors } = err.response.body;
 
 			ctx.status = err.response.status;
 			ctx.body = { errors };
@@ -267,7 +276,7 @@ module.exports = {
 		}
 	},
 
-	handleWebhook: async (ctx) => {
+	handleWebhook: async (ctx, next) => {
 		try {
 			const validRequest = await strapi.plugins.paymongo.services.paymongo.verifyWebhook(
 				ctx.request.headers,
@@ -302,42 +311,59 @@ module.exports = {
 
 		if (status === 'chargeable') {
 			/** Query all payments for now, Strapi can't filter components */
-			const payments = await strapi.query('payment').find({
-				_limit: -1,
-				paymentType: sourceType,
-			});
+			const payment = await strapi
+				.query('paymongo-payments', pluginName)
+				.findOne({
+					_limit: -1,
+					type: sourceType,
+					sourceId,
+				});
 
-			const payment = payments.find(({ paymentOption: { eWallet } }) => {
-				return (
-					eWallet.type === sourceType && eWallet.sourceId === sourceId
+			if (!payment || Object.keys(payment).length === 0) {
+				return;
+			}
+
+			const { id, paymentId } = payment;
+
+			try {
+				const result = await strapi.plugins.paymongo.services.paymongo.createPayment(
+					amount,
+					sourceId,
+					paymentId,
 				);
-			});
-
-			if (!payment) return;
-
-			const {
-				id,
-				paymentId,
-				paymentOption: { eWallet },
-			} = payment;
-
-			const {
-				data: { id: paymongoPaymentId },
-			} = await strapi.plugins.paymongo.services.paymongo.createPayment(
-				amount,
-				sourceId,
-				paymentId,
-			);
-
-			await strapi.query('payment').update(
-				{ id },
-				{
-					paymentOption: {
-						eWallet: { ...eWallet, reference: paymongoPaymentId },
+				const {
+					data: {
+						attributes: { status: paymongoPaymentStatus },
 					},
-					status: 'paid',
-				},
-			);
+				} = result;
+
+				let paymentStatus;
+
+				switch (paymongoPaymentStatus) {
+					case PAYMONGO_PAYMENT_STATUSES.PAID: {
+						paymentStatus = 'success';
+						break;
+					}
+					case PAYMONGO_PAYMENT_STATUSES.FAILED: {
+						paymentStatus = 'fail';
+						break;
+					}
+					case PAYMONGO_PAYMENT_STATUSES.PENDING:
+					default: {
+						paymentStatus = 'pending';
+					}
+				}
+
+				await strapi.query('paymongo-payments', pluginName).update(
+					{ id },
+					{
+						rawResponse: result,
+						status: paymentStatus,
+					},
+				);
+			} catch (err) {
+				await next();
+			}
 		}
 	},
 };
