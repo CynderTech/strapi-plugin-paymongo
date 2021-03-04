@@ -106,38 +106,29 @@ module.exports = {
 		return body;
 	},
 
-	createSource: async (amount, type, platform = 'web') => {
+	createSource: async (amount, type) => {
+		const pluginStore = strapi.store({
+			environment: '',
+			type: 'plugin',
+			name: pluginName,
+			key: 'settings',
+		});
+
 		const {
-			checkout_failure_url: checkoutFailureUrlWeb,
-			checkout_failure_url_mobile: checkoutFailureUrlMobile,
-			checkout_success_url: checkoutSuccessUrlWeb,
-			checkout_success_url_mobile: checkoutSuccessUrlMobile,
-		} = await strapi
-			.store({
-				environment: '',
-				type: 'plugin',
-				name: 'paymongo',
-				key: 'settings',
-			})
-			.get();
+			checkout_failure_url: checkoutFailureUrl,
+			checkout_success_url: checkoutSuccessUrl,
+		} = await pluginStore.get();
 
 		const client = await getClient();
 
-		const checkoutSuccessUrl =
-			platform === 'web'
-				? checkoutSuccessUrlWeb
-				: checkoutSuccessUrlMobile;
-		const checkoutFailureUrl =
-			platform === 'web'
-				? checkoutFailureUrlWeb
-				: checkoutFailureUrlMobile;
-
-		const { body } = await client.createSource(
+		const { body } = await client.createSource({
 			amount,
 			type,
-			checkoutSuccessUrl,
-			checkoutFailureUrl,
-		);
+			redirect: {
+				success: checkoutSuccessUrl,
+				failed: checkoutFailureUrl,
+			},
+		});
 
 		return body;
 	},

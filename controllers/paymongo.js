@@ -123,7 +123,7 @@ module.exports = {
 				);
 			}
 
-			ctx.send(result);
+			return ctx.send(result);
 		} catch (err) {
 			// eslint-disable-next-line no-console
 			console.log(err);
@@ -133,7 +133,7 @@ module.exports = {
 			ctx.status = err.response.status;
 			ctx.body = { errors };
 
-			await next();
+			return next();
 		}
 	},
 
@@ -214,23 +214,27 @@ module.exports = {
 
 			if (status === PAYMENT_INTENT_STATUSES.PROCESSING) {
 				// Need CRON job or schedule job for this OR wait for the webhook for payments
+				return next();
 			}
 
 			if (status === PAYMENT_INTENT_STATUSES.AWAITING_NEXT_ACTION) {
 				// This will probably never happen, but in case that it did, do something
+				return next();
 			}
+
+			return next();
 		} catch (err) {
 			const { errors } = err.response.data;
 
 			ctx.status = err.response.status;
 			ctx.body = { errors };
 
-			await next();
+			return next();
 		}
 	},
 
 	createSource: async (ctx, next) => {
-		const { amount, platform, type } = ctx.request.body;
+		const { amount, type } = ctx.request.body;
 		const validTypes = ['gcash', 'grab_pay'];
 
 		if (!validTypes.includes(type)) {
@@ -251,7 +255,6 @@ module.exports = {
 			const result = await strapi.plugins.paymongo.services.paymongo.createSource(
 				amount,
 				type,
-				platform,
 			);
 			ctx.send(result);
 		} catch (err) {
