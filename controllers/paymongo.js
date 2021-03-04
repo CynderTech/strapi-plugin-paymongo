@@ -108,6 +108,21 @@ module.exports = {
 			const result = await strapi.plugins.paymongo.services.paymongo.attachPaymentIntent(
 				{ intentId, methodId },
 			);
+			const {
+				data: { attributes },
+			} = result;
+			const { status } = attributes;
+
+			if (status === 'succeeded') {
+				strapi.query('paymongo-payments', pluginName).update(
+					{ paymentIntentId: intentId },
+					{
+						status: 'success',
+						rawResponse: JSON.stringify(result),
+					},
+				);
+			}
+
 			ctx.send(result);
 		} catch (err) {
 			// eslint-disable-next-line no-console
