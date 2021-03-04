@@ -208,9 +208,9 @@ const HomePage = () => {
 			<div className="row">
 				<div className="col-6">
 					<Header
-						content="Configure Paymongo settings"
+						content="Configure PayMongo settings"
 						isLoading={loading}
-						title={{ label: 'Paymongo' }}
+						title={{ label: 'PayMongo' }}
 					/>
 				</div>
 				<div className="col-6 row justify-content-end">

@@ -4,7 +4,7 @@
  * @description: A set of functions similar to controller's actions to avoid code duplication.
  */
 
-const Paymongo = require('paymongo-client').default;
+const PayMongo = require('paymongo-client').default;
 
 const getKeys = async () => {
 	const settings = await strapi
@@ -30,7 +30,7 @@ const getKeys = async () => {
 const getClient = async () => {
 	const { public_key: publicKey, secret_key: secretKey } = await getKeys();
 
-	const client = new Paymongo(publicKey, secretKey);
+	const client = new PayMongo(publicKey, secretKey);
 
 	return client;
 };
@@ -113,7 +113,7 @@ module.exports = {
 			})
 			.get();
 
-		return Paymongo.verifyWebhook(
+		return PayMongo.verifyWebhook(
 			webhookSecretKey,
 			paymongoHeader,
 			payload,

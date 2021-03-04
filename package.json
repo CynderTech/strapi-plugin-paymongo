@@ -1,11 +1,11 @@
 {
   "name": "strapi-plugin-paymongo",
   "version": "1.0.3",
-  "description": "Strapi plugin for Paymongo - Community Edition",
+  "description": "Strapi plugin for PayMongo - Community Edition",
   "strapi": {
     "name": "paymongo",
     "icon": "plug",
-    "description": "A Strapi plugin to interface with Paymongo API"
+    "description": "A Strapi plugin to interface with PayMongo API"
   },
   "scripts": {
     "postinstall": "husky install",

@@ -33,7 +33,7 @@ export default (strapi) => {
 					icon,
 					label: {
 						id: `${pluginId}.plugin.name`,
-						defaultMessage: 'Paymongo',
+						defaultMessage: 'PayMongo',
 					},
 					name,
 					permissions: [
