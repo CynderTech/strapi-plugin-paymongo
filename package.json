@@ -18,7 +18,7 @@
     "@buffetjs/custom": "^3.3.4",
     "koa-body": "4.2.0",
     "nanoid": "3.1.20",
-    "paymongo-client": "1.1.0",
+    "paymongo-client": "1.2.0",
     "prop-types": "^15.7.2",
     "react": "^17.0.1",
     "react-router-dom": "^5.2.0",
