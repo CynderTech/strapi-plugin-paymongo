@@ -37,18 +37,21 @@ const getClient = async () => {
 
 module.exports = {
 	createPaymentIntent: async (amount, description) => {
-    const client = await getClient();
-    
-		const { body } = await client.createPaymentIntent({ amount, description });
+		const client = await getClient();
+
+		const { body } = await client.createPaymentIntent({
+			amount,
+			description,
+		});
 
 		return body;
 	},
 	createSource: async (amount, type, platform = 'web') => {
 		const {
-      checkout_failure_url: checkoutFailureUrlWeb,
-      checkout_failure_url_mobile: checkoutFailureUrlMobile,
-      checkout_success_url: checkoutSuccessUrlWeb,
-      checkout_success_url_mobile: checkoutSuccessUrlMobile,
+			checkout_failure_url: checkoutFailureUrlWeb,
+			checkout_failure_url_mobile: checkoutFailureUrlMobile,
+			checkout_success_url: checkoutSuccessUrlWeb,
+			checkout_success_url_mobile: checkoutSuccessUrlMobile,
 		} = await strapi
 			.store({
 				environment: '',
@@ -58,10 +61,16 @@ module.exports = {
 			})
 			.get();
 
-    const client = await getClient();
-    
-    const checkoutSuccessUrl = platform === 'web' ? checkoutSuccessUrlWeb : checkoutSuccessUrlMobile;
-    const checkoutFailureUrl = platform === 'web' ? checkoutFailureUrlWeb : checkoutFailureUrlMobile;
+		const client = await getClient();
+
+		const checkoutSuccessUrl =
+			platform === 'web'
+				? checkoutSuccessUrlWeb
+				: checkoutSuccessUrlMobile;
+		const checkoutFailureUrl =
+			platform === 'web'
+				? checkoutFailureUrlWeb
+				: checkoutFailureUrlMobile;
 
 		const { body } = await client.createSource(
 			amount,
@@ -92,7 +101,10 @@ module.exports = {
 
 		if (!paymongoHeader) return false;
 
-		const { test_mode: testMode, webhook_secret_key: webhookSecretKey } = await strapi
+		const {
+			test_mode: testMode,
+			webhook_secret_key: webhookSecretKey,
+		} = await strapi
 			.store({
 				environment: '',
 				type: 'plugin',

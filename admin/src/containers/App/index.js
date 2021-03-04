@@ -14,14 +14,18 @@ import pluginId from '../../pluginId';
 import HomePage from '../HomePage';
 
 const App = () => {
-  return (
-    <div>
-      <Switch>
-        <Route path={`/plugins/${pluginId}`} component={HomePage} exact />
-        <Route component={NotFound} />
-      </Switch>
-    </div>
-  );
+	return (
+		<div>
+			<Switch>
+				<Route
+					component={HomePage}
+					exact
+					path={`/plugins/${pluginId}`}
+				/>
+				<Route component={NotFound} />
+			</Switch>
+		</div>
+	);
 };
 
 export default App;

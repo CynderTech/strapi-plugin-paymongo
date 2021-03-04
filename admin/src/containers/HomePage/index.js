@@ -18,17 +18,21 @@ const HomePage = () => {
 	const [testSecretKey, setTestSecretKey] = useState('');
 	const [webhookSecretKey, setWebhookSecretKey] = useState('');
 	const [checkoutSuccessUrlWeb, setCheckoutSuccessUrlWeb] = useState('');
-  const [checkoutFailureUrlWeb, setCheckoutFailureUrlWeb] = useState('');
-  const [checkoutSuccessUrlMobile, setCheckoutSuccessUrlMobile] = useState('');
-	const [checkoutFailureUrlMobile, setCheckoutFailureUrlMobile] = useState('');
+	const [checkoutFailureUrlWeb, setCheckoutFailureUrlWeb] = useState('');
+	const [checkoutSuccessUrlMobile, setCheckoutSuccessUrlMobile] = useState(
+		'',
+	);
+	const [checkoutFailureUrlMobile, setCheckoutFailureUrlMobile] = useState(
+		'',
+	);
 
 	useEffect(() => {
 		const querySettings = async () => {
 			const {
 				checkout_failure_url: retrievedCheckoutFailureUrl,
-        checkout_failure_url_mobile: retrievedCheckoutFailureUrlMobile,
-        checkout_success_url: retrievedCheckoutSuccessUrl,
-        checkout_success_url_mobile: retrievedCheckoutSuccessUrlMobile,
+				checkout_failure_url_mobile: retrievedCheckoutFailureUrlMobile,
+				checkout_success_url: retrievedCheckoutSuccessUrl,
+				checkout_success_url_mobile: retrievedCheckoutSuccessUrlMobile,
 				live_public_key: retrievedLivePublicKey,
 				live_secret_key: retrievedLiveSecretKey,
 				test_mode: retrievedTestMode,
@@ -46,9 +50,13 @@ const HomePage = () => {
 			setTestMode(retrievedTestMode);
 			setWebhookSecretKey(retrievedWebhookSecretKey || '');
 			setCheckoutSuccessUrlWeb(retrievedCheckoutSuccessUrl || '');
-      setCheckoutFailureUrlWeb(retrievedCheckoutFailureUrl || '');
-      setCheckoutSuccessUrlMobile(retrievedCheckoutSuccessUrlMobile || '');
-			setCheckoutFailureUrlMobile(retrievedCheckoutFailureUrlMobile || '');
+			setCheckoutFailureUrlWeb(retrievedCheckoutFailureUrl || '');
+			setCheckoutSuccessUrlMobile(
+				retrievedCheckoutSuccessUrlMobile || '',
+			);
+			setCheckoutFailureUrlMobile(
+				retrievedCheckoutFailureUrlMobile || '',
+			);
 		};
 
 		setLoading(true);
@@ -81,13 +89,15 @@ const HomePage = () => {
 			}
 		} catch (err) {
 			/** Need better error handling */
-			strapi.notification.error('Something went wrong. Contact administrator.');
+			strapi.notification.error(
+				'Something went wrong. Contact administrator.',
+			);
 		}
 	};
 
 	const renderFields = () => {
 		return (
-			<div class="row mb-5">
+			<div className="row mb-5">
 				<div className="col-12">
 					<Padded bottom>
 						<Text fontSize="lg" fontWeight="bold">
@@ -152,7 +162,9 @@ const HomePage = () => {
 				<div className="col-12">
 					<Inputs
 						label="Checkout Success (Web)"
-						onChange={(e) => setCheckoutSuccessUrlWeb(e.target.value)}
+						onChange={(e) =>
+							setCheckoutSuccessUrlWeb(e.target.value)
+						}
 						type="text"
 						value={checkoutSuccessUrlWeb}
 					/>
@@ -160,15 +172,19 @@ const HomePage = () => {
 				<div className="col-12">
 					<Inputs
 						label="Checkout Failure (Web)"
-						onChange={(e) => setCheckoutFailureUrlWeb(e.target.value)}
+						onChange={(e) =>
+							setCheckoutFailureUrlWeb(e.target.value)
+						}
 						type="text"
 						value={checkoutFailureUrlWeb}
 					/>
 				</div>
-        <div className="col-12">
+				<div className="col-12">
 					<Inputs
 						label="Checkout Success (Mobile)"
-						onChange={(e) => setCheckoutSuccessUrlMobile(e.target.value)}
+						onChange={(e) =>
+							setCheckoutSuccessUrlMobile(e.target.value)
+						}
 						type="text"
 						value={checkoutSuccessUrlMobile}
 					/>
@@ -176,7 +192,9 @@ const HomePage = () => {
 				<div className="col-12">
 					<Inputs
 						label="Checkout Failure (Mobile)"
-						onChange={(e) => setCheckoutFailureUrlMobile(e.target.value)}
+						onChange={(e) =>
+							setCheckoutFailureUrlMobile(e.target.value)
+						}
 						type="text"
 						value={checkoutFailureUrlMobile}
 					/>
@@ -187,19 +205,23 @@ const HomePage = () => {
 
 	return (
 		<div className="container-fluid" style={{ padding: '18px 30px' }}>
-			<div class="row">
+			<div className="row">
 				<div className="col-6">
 					<Header
-						title={{ label: 'Paymongo' }}
 						content="Configure Paymongo settings"
 						isLoading={loading}
+						title={{ label: 'Paymongo' }}
 					/>
 				</div>
 				<div className="col-6 row justify-content-end">
-					<Button color="primary" label="Save Changes" onClick={handleSubmit} />
+					<Button
+						color="primary"
+						label="Save Changes"
+						onClick={handleSubmit}
+					/>
 				</div>
 			</div>
-			<div class="row">
+			<div className="row">
 				<div className="col-md-12 col-lg-9">
 					<div
 						style={{
@@ -207,13 +229,16 @@ const HomePage = () => {
 							background: '#ffffff',
 							borderRadius: '2px',
 							boxShadow: '0 2px 4px #e3e9f3',
-						}}>
-						<div class="row mb-5">
+						}}
+					>
+						<div className="row mb-5">
 							<div className="col-6">
 								<Label htmlFor="isTestMode">Test Mode</Label>
 								<Toggle
 									name="isTestMode"
-									onChange={(e) => setTestMode(e.target.value)}
+									onChange={(e) =>
+										setTestMode(e.target.value)
+									}
 									value={testMode}
 								/>
 							</div>

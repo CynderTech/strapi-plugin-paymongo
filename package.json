@@ -14,8 +14,14 @@
     "pretest": "npm run lint"
   },
   "dependencies": {
+    "@buffetjs/core": "^3.3.4",
+    "@buffetjs/custom": "^3.3.4",
     "koa-body": "^4.2.0",
-    "paymongo-client": "^1.0.2"
+    "paymongo-client": "^1.0.2",
+    "prop-types": "^15.7.2",
+    "react": "^17.0.1",
+    "react-router-dom": "^5.2.0",
+    "strapi-helper-plugin": "^3.5.2"
   },
   "author": {
     "name": "Cyndertech",
@@ -64,8 +70,8 @@
     "prettier": "^2.2.1"
   },
   "lint-staged": {
-      "*.js": [
-          "./node_modules/.bin/eslint"
-      ]
+    "*.js": [
+      "./node_modules/.bin/eslint"
+    ]
   }
 }

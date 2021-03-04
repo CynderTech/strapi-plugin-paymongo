@@ -30,7 +30,9 @@ module.exports = {
 
 		const settings = await pluginSettingsStore.get();
 
-		await pluginSettingsStore.set({ value: { ...settings, ...ctx.request.body } });
+		await pluginSettingsStore.set({
+			value: { ...settings, ...ctx.request.body },
+		});
 
 		ctx.send({
 			ok: true,
@@ -51,14 +53,16 @@ module.exports = {
 			};
 			await next();
 			return;
-    }
-    
-    const intentArgs = [amount];
+		}
 
-    if (description) intentArgs.push(description);
+		const intentArgs = [amount];
+
+		if (description) intentArgs.push(description);
 
 		try {
-			const result = await strapi.plugins.paymongo.services.paymongo.createPaymentIntent(...intentArgs);
+			const result = await strapi.plugins.paymongo.services.paymongo.createPaymentIntent(
+				...intentArgs,
+			);
 			ctx.send(result);
 		} catch (err) {
 			const { errors } = err.response.data;
@@ -91,8 +95,8 @@ module.exports = {
 		try {
 			const result = await strapi.plugins.paymongo.services.paymongo.createSource(
 				amount,
-        type,
-        platform,
+				type,
+				platform,
 			);
 			ctx.send(result);
 		} catch (err) {
@@ -141,12 +145,14 @@ module.exports = {
 		if (status === 'chargeable') {
 			/** Query all payments for now, Strapi can't filter components */
 			const payments = await strapi.query('payment').find({
-        _limit: -1,
+				_limit: -1,
 				paymentType: sourceType,
 			});
 
 			const payment = payments.find(({ paymentOption: { eWallet } }) => {
-				return eWallet.type === sourceType && eWallet.sourceId === sourceId;
+				return (
+					eWallet.type === sourceType && eWallet.sourceId === sourceId
+				);
 			});
 
 			if (!payment) return;
@@ -168,7 +174,9 @@ module.exports = {
 			await strapi.query('payment').update(
 				{ id },
 				{
-					paymentOption: { eWallet: { ...eWallet, reference: paymongoPaymentId } },
+					paymentOption: {
+						eWallet: { ...eWallet, reference: paymongoPaymentId },
+					},
 					status: 'paid',
 				},
 			);
