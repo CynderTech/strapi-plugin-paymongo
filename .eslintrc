@@ -1,0 +1,53 @@
+{
+	"env": {
+		"browser": true,
+		"es6": true
+	},
+	"extends": ["airbnb", "plugin:prettier/recommended"],
+	"globals": {
+		"Atomics": "readonly",
+		"SharedArrayBuffer": "readonly",
+		"strapi": true
+	},
+	"parser": "babel-eslint",
+	"parserOptions": {
+		"ecmaFeatures": {
+			"jsx": true
+		},
+		"ecmaVersion": 2018,
+		"sourceType": "module"
+	},
+	"plugins": ["prettier", "react", "sort-destructure-keys"],
+	"rules": {
+		"consistent-return": "warn",
+		"indent": [
+			"error",
+			"tab",
+			{
+				"SwitchCase": 1
+			}
+		],
+		"no-alert": "error",
+		"no-console": "error",
+		"no-debugger": "error",
+		"no-tabs": "off",
+		"no-use-before-define": "error",
+		"prettier/prettier": "error",
+		"react/jsx-filename-extension": ["error", { "extensions": [".js"] }],
+		"react/jsx-indent": ["error", "tab"],
+		"react/jsx-indent-props": ["error", "tab"],
+		"react/jsx-key": "error",
+		"react/jsx-sort-default-props": ["error", { "ignoreCase": false }],
+		"react/jsx-sort-props": [
+			"error",
+			{ "ignoreCase": false, "reservedFirst": true }
+		],
+		"react/no-did-mount-set-state": "error",
+		"react/no-direct-mutation-state": "error",
+		"react/sort-prop-types": ["error", { "ignoreCase": false }],
+		"sort-destructure-keys/sort-destructure-keys": [
+			"error",
+			{ "caseSensitive": true }
+		]
+	}
+}
