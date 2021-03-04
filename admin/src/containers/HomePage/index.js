@@ -8,7 +8,7 @@ import React, { memo, useEffect, useState } from 'react';
 import { Button, Label, Padded, Text, Toggle } from '@buffetjs/core';
 import { Header, Inputs } from '@buffetjs/custom';
 import { request } from 'strapi-helper-plugin';
-import { SETTINGS } from '../../../../constants';
+import { SETTINGS } from '../../constants';
 
 const HomePage = () => {
 	const [loading, setLoading] = useState(false);

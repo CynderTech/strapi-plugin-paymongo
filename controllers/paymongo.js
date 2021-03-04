@@ -5,7 +5,7 @@
  */
 
 const unparsed = require('koa-body/unparsed');
-const { PAYMENT_INTENT_STATUSES } = require('../constants');
+const { PAYMENT_INTENT_STATUSES } = require('../admin/src/constants');
 
 const pluginPkg = require('../package.json');
 const { name: pluginName } = pluginPkg.strapi;
