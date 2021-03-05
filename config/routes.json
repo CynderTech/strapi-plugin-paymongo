@@ -26,6 +26,14 @@
     },
     {
       "method": "POST",
+      "path": "/payment-intent/attach",
+      "handler": "paymongo.attachPaymentIntent",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "POST",
       "path": "/source",
       "handler": "paymongo.createSource",
       "config": {
@@ -36,6 +44,14 @@
       "method": "POST",
       "path": "/webhook",
       "handler": "paymongo.handleWebhook",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/process-3ds-redirect",
+      "handler": "paymongo.process3dsRedirect",
       "config": {
         "policies": []
       }

@@ -6,6 +6,10 @@
 
 const PayMongo = require('paymongo-client').default;
 
+const pluginPkg = require('../package.json');
+
+const { name: pluginName } = pluginPkg.strapi;
+
 const getKeys = async () => {
 	const settings = await strapi
 		.store({
@@ -35,49 +39,100 @@ const getClient = async () => {
 	return client;
 };
 
+const getDefaultDescription = async (paymentId) => {
+	const pluginStore = strapi.store({
+		environment: '',
+		type: 'plugin',
+		name: pluginName,
+		key: 'settings',
+	});
+
+	const { company_name: companyName } = await pluginStore.get();
+
+	return `${companyName} - ${paymentId}`;
+};
+
 module.exports = {
-	createPaymentIntent: async (amount, description) => {
+	createPaymentIntent: async ({ paymentId, ...payload }) => {
 		const client = await getClient();
 
 		const { body } = await client.createPaymentIntent({
-			amount,
-			description,
+			...payload,
+			description: await getDefaultDescription(paymentId),
 		});
 
 		return body;
 	},
-	createSource: async (amount, type, platform = 'web') => {
+
+	attachPaymentIntent: async (payload) => {
+		const client = await getClient();
+
+		const pluginStore = strapi.store({
+			environment: '',
+			type: 'plugin',
+			name: pluginName,
+			key: 'settings',
+		});
+
+		const { use_3ds_redirect: use3dsRedirect } = await pluginStore.get();
+
+		const overrides = {};
+
+		if (use3dsRedirect && typeof payload.redirect === 'undefined') {
+			const { url: serverUrl } = strapi.config.server;
+
+			const payment = await strapi
+				.query('paymongo-payments', pluginName)
+				.findOne({ paymentIntentId: payload.intentId });
+
+			if (payment && Object.keys(payment).length > 0) {
+				overrides.redirect = `${
+					serverUrl || 'http://localhost:1337'
+				}/paymongo/process-3ds-redirect?pid=${payment.paymentId}&vt=${
+					payment.verificationToken
+				}`;
+			}
+		}
+
+		const { body } = await client.attachPaymentIntent({
+			...payload,
+			...overrides,
+		});
+
+		return body;
+	},
+
+	retrievePaymentIntent: async (intentId) => {
+		const client = await getClient();
+
+		const { body } = await client.retrievePaymentIntent(intentId);
+
+		return body;
+	},
+
+	createSource: async (amount, type) => {
+		const pluginStore = strapi.store({
+			environment: '',
+			type: 'plugin',
+			name: pluginName,
+			key: 'settings',
+		});
+
 		const {
-			checkout_failure_url: checkoutFailureUrlWeb,
-			checkout_failure_url_mobile: checkoutFailureUrlMobile,
-			checkout_success_url: checkoutSuccessUrlWeb,
-			checkout_success_url_mobile: checkoutSuccessUrlMobile,
-		} = await strapi
-			.store({
-				environment: '',
-				type: 'plugin',
-				name: 'paymongo',
-				key: 'settings',
-			})
-			.get();
+			checkout_failure_url: checkoutFailureUrl,
+			checkout_success_url: checkoutSuccessUrl,
+		} = await pluginStore.get();
 
 		const client = await getClient();
 
-		const checkoutSuccessUrl =
-			platform === 'web'
-				? checkoutSuccessUrlWeb
-				: checkoutSuccessUrlMobile;
-		const checkoutFailureUrl =
-			platform === 'web'
-				? checkoutFailureUrlWeb
-				: checkoutFailureUrlMobile;
-
-		const { body } = await client.createSource(
+		const { body } = await client.createSource({
 			amount,
 			type,
-			checkoutSuccessUrl,
-			checkoutFailureUrl,
-		);
+			redirect: {
+				success: checkoutSuccessUrl,
+				failed: checkoutFailureUrl,
+			},
+		});
 
 		return body;
 	},
@@ -86,12 +141,14 @@ module.exports = {
 	createPayment: async (amount, sourceId, paymentId) => {
 		const client = await getClient();
 
-		/** Need to change description to a setting at some point */
-		const { body } = await client.createPayment(
+		const { body } = await client.createPayment({
 			amount,
-			sourceId,
-			`Ramen Kuroda - ${paymentId}`,
-		);
+			description: await getDefaultDescription(paymentId),
+			source: {
+				id: sourceId,
+				type: 'source',
+			},
+		});
 
 		return body;
 	},
