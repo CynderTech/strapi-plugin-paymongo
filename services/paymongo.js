@@ -58,7 +58,11 @@ module.exports = {
 
 		const { body } = await client.createPaymentIntent({
 			...payload,
-			description: await getDefaultDescription(paymentId),
+			description: `${await getDefaultDescription(paymentId)}${
+				payload.statement_descriptor
+					? ` - ${payload.statement_descriptor}`
+					: ''
+			}}`,
 		});
 
 		return body;
