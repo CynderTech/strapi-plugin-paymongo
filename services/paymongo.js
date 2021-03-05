@@ -114,7 +114,7 @@ module.exports = {
 		return body;
 	},
 
-	createSource: async (amount, type) => {
+	createSource: async (amount, type, billing) => {
 		const pluginStore = strapi.store({
 			environment: '',
 			type: 'plugin',
@@ -136,6 +136,7 @@ module.exports = {
 				success: checkoutSuccessUrl,
 				failed: checkoutFailureUrl,
 			},
+			billing,
 		});
 
 		return body;
