@@ -62,7 +62,7 @@ module.exports = {
 				payload.statement_descriptor
 					? ` - ${payload.statement_descriptor}`
 					: ''
-			}}`,
+			}`,
 		});
 
 		return body;

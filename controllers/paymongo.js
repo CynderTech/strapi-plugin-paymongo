@@ -48,7 +48,10 @@ module.exports = {
 	},
 
 	createPaymentIntent: async (ctx, next) => {
-		const { amount } = ctx.request.body;
+		const {
+			amount,
+			statement_descriptor: statementDescriptor,
+		} = ctx.request.body;
 
 		if (!amount) {
 			ctx.status = 400;
@@ -67,7 +70,11 @@ module.exports = {
 			.query('paymongo-payments', pluginName)
 			.create({ type: 'cc' });
 
-		const payload = { amount, paymentId: newPayment.paymentId };
+		const payload = {
+			amount,
+			paymentId: newPayment.paymentId,
+			statement_descriptor: statementDescriptor,
+		};
 
 		try {
 			const result = await strapi.plugins.paymongo.services.paymongo.createPaymentIntent(
