@@ -143,12 +143,19 @@ module.exports = {
 	},
 
 	/** https://developers.paymongo.com/reference#create-a-payment */
-	createPayment: async (amount, sourceId, paymentId) => {
+	createPayment: async (
+		amount,
+		sourceId,
+		paymentId,
+		statementDescriptor = null,
+	) => {
 		const client = await getClient();
 
 		const { body } = await client.createPayment({
 			amount,
-			description: await getDefaultDescription(paymentId),
+			description: `${await getDefaultDescription(paymentId)}${
+				statementDescriptor ? ` - ${statementDescriptor}` : ''
+			}`,
 			source: {
 				id: sourceId,
 				type: 'source',
