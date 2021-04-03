@@ -2175,7 +2175,7 @@ kind-of@^6.0.3:
   resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-6.0.3.tgz#07c05034a6c349fa06e24fa35aa76db4580ce4dd"
   integrity sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==
 
-koa-body@^4.2.0:
+koa-body@4.2.0:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/koa-body/-/koa-body-4.2.0.tgz#37229208b820761aca5822d14c5fc55cee31b26f"
   integrity sha512-wdGu7b9amk4Fnk/ytH8GuWwfs4fsB5iNkY8kZPpgQVb04QZSv85T0M8reb+cJmvLE8cjPYvBzRikD3s6qz8OoA==
@@ -2464,6 +2464,11 @@ ms@2.1.2:
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.2.tgz#d09d1f357b443f493382a8eb3ccd183872ae6009"
   integrity sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==
 
+nanoid@3.1.20:
+  version "3.1.20"
+  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.1.20.tgz#badc263c6b1dcf14b71efaa85f6ab4c1d6cfc788"
+  integrity sha512-a1cQNyczgKbLX9jwbS/+d7W8fX/RfgYR7lVWwWOGIPNgK2m0MWvrGF6/m4kk6U3QcFMnZf3RIhL0v2Jgh/0Uxw==
+
 natural-compare-lite@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/natural-compare-lite/-/natural-compare-lite-1.4.0.tgz#17b09581988979fddafe0201e931ba933c96cbb4"
@@ -2722,10 +2727,10 @@ path-type@^4.0.0:
   resolved "https://registry.yarnpkg.com/path-type/-/path-type-4.0.0.tgz#84ed01c0a7ba380afe09d90a8c180dcd9d03043b"
   integrity sha512-gDKb8aZMDeD/tZWs9P6+q0J9Mwkdl6xMV8TjnGP3qJVJ06bdMgkbBlLU8IdfOsIsFz2BW1rNVT3XuNEl8zPAvw==
 
-paymongo-client@^1.0.2:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/paymongo-client/-/paymongo-client-1.1.0.tgz#4ab65c6d8ea61a916606f9b3074e7ae43e84f30b"
-  integrity sha512-6w63srcIDFmBRSAdRX0DJofp1CIRCwR5O1t3t7L8Gt2MjKndroFNUcCMR/jKGeypwx5F0dfp2Bo3270v8Vw+4A==
+paymongo-client@1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/paymongo-client/-/paymongo-client-1.2.0.tgz#5324555c69627e505d42c2edc7c62bd966801425"
+  integrity sha512-2LduKN51A7NEsrdujeKQ/xJIzadQ+gcXiQqZ+jKCK4/Evk/1oNsdrS5sWCTAlFJ2pOFLcxBibdjv4PYvyJ0uGQ==
   dependencies:
     superagent "^6.1.0"
 
