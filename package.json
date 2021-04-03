@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "koa-body": "^4.2.0",
-    "paymongo-client": "^1.0.2"
+    "paymongo-client": "1.0.2"
   },
   "author": {
     "name": "Cyndertech",
