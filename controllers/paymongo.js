@@ -149,7 +149,7 @@ module.exports = {
 				return eWallet.type === sourceType && eWallet.sourceId === sourceId;
 			});
 
-			if (!payment) return;
+			if (!payment || payment.status === 'paid') return;
 
 			const {
 				id,
