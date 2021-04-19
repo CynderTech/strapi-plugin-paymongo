@@ -5,6 +5,7 @@
  */
 
 const unparsed = require('koa-body/unparsed');
+const _ = require('lodash');
 
 module.exports = {
 	getSettings: async (ctx) => {
@@ -145,8 +146,11 @@ module.exports = {
 				paymentType: sourceType,
 			});
 
-			const payment = payments.find(({ paymentOption: { eWallet } }) => {
-				return eWallet.type === sourceType && eWallet.sourceId === sourceId;
+			const payment = payments.find((paymentRecord) => {
+        const walletPaymentType = _.get(paymentRecord, 'paymentOption.eWallet.type');
+        const walletPaymentSourceId = _.get(paymentRecord, 'paymentOption.eWallet.sourceId');
+
+				return walletPaymentType === sourceType && walletPaymentSourceId === sourceId;
 			});
 
 			if (!payment || payment.status === 'paid') return;
