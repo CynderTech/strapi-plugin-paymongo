@@ -63,12 +63,14 @@ module.exports = {
     const checkoutSuccessUrl = platform === 'web' ? checkoutSuccessUrlWeb : checkoutSuccessUrlMobile;
     const checkoutFailureUrl = platform === 'web' ? checkoutFailureUrlWeb : checkoutFailureUrlMobile;
 
-		const { body } = await client.createSource(
+		const { body } = await client.createSource({
 			amount,
 			type,
-			checkoutSuccessUrl,
-			checkoutFailureUrl,
-		);
+      redirect: {
+        success: checkoutSuccessUrl,
+        failed: checkoutFailureUrl,
+      },
+    });
 
 		return body;
 	},
@@ -78,11 +80,14 @@ module.exports = {
 		const client = await getClient();
 
 		/** Need to change description to a setting at some point */
-		const { body } = await client.createPayment(
-			amount,
-			sourceId,
-			`Ramen Kuroda - ${paymentId}`,
-		);
+    const { body } = await client.createPayment({
+      amount,
+      description: `Ramen Kuroda - ${paymentId}`,
+      source: {
+        id: sourceId,
+        type: 'source',
+      },
+    });
 
 		return body;
 	},

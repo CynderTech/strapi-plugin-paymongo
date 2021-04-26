@@ -5,6 +5,7 @@
  */
 
 const unparsed = require('koa-body/unparsed');
+const _ = require('lodash');
 
 module.exports = {
 	getSettings: async (ctx) => {
@@ -61,10 +62,15 @@ module.exports = {
 			const result = await strapi.plugins.paymongo.services.paymongo.createPaymentIntent(...intentArgs);
 			ctx.send(result);
 		} catch (err) {
-			const { errors } = err.response.data;
+			const errors = _.get(err, 'response.data.errors', null);
 
-			ctx.status = err.response.status;
-			ctx.body = { errors };
+      if (errors) {
+        ctx.status = err.response.status;
+        ctx.body = { errors };
+      } else {
+        ctx.log.error(err);
+        ctx.badImplementation('Something went wrong');
+      }
 
 			await next();
 		}
@@ -96,10 +102,15 @@ module.exports = {
 			);
 			ctx.send(result);
 		} catch (err) {
-			const { errors } = err.response.data;
+			const errors = _.get(err, 'response.data.errors', null);
 
-			ctx.status = err.response.status;
-			ctx.body = { errors };
+      if (errors) {
+        ctx.status = err.response.status;
+        ctx.body = { errors };
+      } else {
+        ctx.log.error(err);
+        ctx.badImplementation('Something went wrong');
+      }
 
 			await next();
 		}
@@ -114,6 +125,7 @@ module.exports = {
 
 			if (!validRequest) throw new Error('Invalid webhook request');
 		} catch (err) {
+      strapi.log.error(err);
 			/** Do something if not valid webhook request */
 			return;
 		}
@@ -136,7 +148,10 @@ module.exports = {
 		const validEventTypes = ['source.chargeable'];
 
 		/** If not a valid event type, ignore */
-		if (type === 'event' && !validEventTypes.includes(eventType)) return;
+		if (type === 'event' && !validEventTypes.includes(eventType)) {
+      strapi.log.error(`Not a valid event type: ${eventType}`);
+      return;
+    }
 
 		if (status === 'chargeable') {
 			/** Query all payments for now, Strapi can't filter components */
@@ -157,21 +172,25 @@ module.exports = {
 				paymentOption: { eWallet },
 			} = payment;
 
-			const {
-				data: { id: paymongoPaymentId },
-			} = await strapi.plugins.paymongo.services.paymongo.createPayment(
-				amount,
-				sourceId,
-				paymentId,
-			);
-
-			await strapi.query('payment').update(
-				{ id },
-				{
-					paymentOption: { eWallet: { ...eWallet, reference: paymongoPaymentId } },
-					status: 'paid',
-				},
-			);
+      try {
+        const {
+          data: { id: paymongoPaymentId },
+        } = await strapi.plugins.paymongo.services.paymongo.createPayment(
+          amount,
+          sourceId,
+          paymentId,
+        );
+          
+        await strapi.query('payment').update(
+          { id },
+          {
+            paymentOption: { eWallet: { ...eWallet, reference: paymongoPaymentId } },
+            status: 'paid',
+          },
+        );
+      } catch (err) {
+        strapi.log.error(err);
+      }
 		}
 	},
 };
