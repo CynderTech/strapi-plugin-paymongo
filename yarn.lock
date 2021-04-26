@@ -2727,10 +2727,10 @@ path-type@^4.0.0:
   resolved "https://registry.yarnpkg.com/path-type/-/path-type-4.0.0.tgz#84ed01c0a7ba380afe09d90a8c180dcd9d03043b"
   integrity sha512-gDKb8aZMDeD/tZWs9P6+q0J9Mwkdl6xMV8TjnGP3qJVJ06bdMgkbBlLU8IdfOsIsFz2BW1rNVT3XuNEl8zPAvw==
 
-paymongo-client@1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/paymongo-client/-/paymongo-client-1.2.0.tgz#5324555c69627e505d42c2edc7c62bd966801425"
-  integrity sha512-2LduKN51A7NEsrdujeKQ/xJIzadQ+gcXiQqZ+jKCK4/Evk/1oNsdrS5sWCTAlFJ2pOFLcxBibdjv4PYvyJ0uGQ==
+paymongo-client@1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/paymongo-client/-/paymongo-client-1.2.2.tgz#b85710d2adaa16de005e96c9118a7d9d6217ac45"
+  integrity sha512-1q1EJCbfszMiWOLdJ53j3vOMD8EXbknewHMF5TgMEhDZNhYwlXCiM8myWOmwTGDGRFKAtEjE2U1+3iNcP0lk+w==
   dependencies:
     superagent "^6.1.0"
 
