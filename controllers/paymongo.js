@@ -5,6 +5,14 @@
  */
 
 const unparsed = require('koa-body/unparsed');
+const {
+	PAYMENT_INTENT_STATUSES,
+	PAYMONGO_PAYMENT_STATUSES,
+} = require('../constants');
+
+const pluginPkg = require('../package.json');
+
+const { name: pluginName } = pluginPkg.strapi;
 
 module.exports = {
 	getSettings: async (ctx) => {
@@ -30,7 +38,9 @@ module.exports = {
 
 		const settings = await pluginSettingsStore.get();
 
-		await pluginSettingsStore.set({ value: { ...settings, ...ctx.request.body } });
+		await pluginSettingsStore.set({
+			value: { ...settings, ...ctx.request.body },
+		});
 
 		ctx.send({
 			ok: true,
@@ -38,7 +48,10 @@ module.exports = {
 	},
 
 	createPaymentIntent: async (ctx, next) => {
-		const { amount, description } = ctx.request.body;
+		const {
+			amount,
+			statement_descriptor: statementDescriptor,
+		} = ctx.request.body;
 
 		if (!amount) {
 			ctx.status = 400;
@@ -51,17 +64,33 @@ module.exports = {
 			};
 			await next();
 			return;
-    }
-    
-    const intentArgs = [amount];
+		}
 
-    if (description) intentArgs.push(description);
+		const newPayment = await strapi
+			.query('paymongo-payments', pluginName)
+			.create({ type: 'cc' });
+
+		const payload = {
+			amount,
+			paymentId: newPayment.paymentId,
+			statement_descriptor: statementDescriptor,
+		};
 
 		try {
-			const result = await strapi.plugins.paymongo.services.paymongo.createPaymentIntent(...intentArgs);
+			const result = await strapi.plugins.paymongo.services.paymongo.createPaymentIntent(
+				payload,
+			);
+			const {
+				data: { id: paymentIntentId },
+			} = result;
+
+			strapi
+				.query('paymongo-payments', pluginName)
+				.update({ id: newPayment.id }, { paymentIntentId });
+
 			ctx.send(result);
 		} catch (err) {
-			const { errors } = err.response.data;
+			const { errors } = err.response.body;
 
 			ctx.status = err.response.status;
 			ctx.body = { errors };
@@ -70,8 +99,149 @@ module.exports = {
 		}
 	},
 
+	attachPaymentIntent: async (ctx, next) => {
+		const { intentId, methodId } = ctx.request.body;
+
+		if (!methodId || !intentId) {
+			ctx.status = 400;
+			ctx.body = {
+				errors: [
+					{
+						detail: 'Invalid request',
+					},
+				],
+			};
+			return next();
+		}
+
+		try {
+			const result = await strapi.plugins.paymongo.services.paymongo.attachPaymentIntent(
+				{ intentId, methodId },
+			);
+			const {
+				data: { attributes },
+			} = result;
+			const { status } = attributes;
+
+			if (status === 'succeeded') {
+				strapi.query('paymongo-payments', pluginName).update(
+					{ paymentIntentId: intentId },
+					{
+						status: 'success',
+						rawResponse: JSON.stringify(result),
+					},
+				);
+			}
+
+			return ctx.send(result);
+		} catch (err) {
+			const { errors } = err.response.body;
+
+			ctx.status = err.response.status;
+			ctx.body = { errors };
+
+			return next();
+		}
+	},
+
+	process3dsRedirect: async (ctx, next) => {
+		const { pid, vt } = ctx.query;
+
+		if (!pid || !vt) {
+			ctx.status = 400;
+			ctx.body = {
+				errors: [
+					{
+						detail: 'Invalid request',
+					},
+				],
+			};
+			return next();
+		}
+
+		const payment = await strapi
+			.query('paymongo-payments', pluginName)
+			.findOne({ paymentId: pid, verificationToken: vt });
+
+		if (!payment || Object.keys(payment).length === 0) {
+			ctx.status = 400;
+			ctx.body = {
+				errors: [
+					{
+						detail: 'Invalid request',
+					},
+				],
+			};
+			return next();
+		}
+
+		try {
+			const result = await strapi.plugins.paymongo.services.paymongo.retrievePaymentIntent(
+				payment.paymentIntentId,
+			);
+			const {
+				data: { attributes },
+			} = result;
+			const { status } = attributes;
+
+			const pluginStore = strapi.store({
+				environment: '',
+				type: 'plugin',
+				name: pluginName,
+				key: 'settings',
+			});
+
+			const {
+				checkout_failure_url: checkoutFailureUrl,
+				checkout_success_url: checkoutSuccessUrl,
+			} = await pluginStore.get();
+
+			if (status === PAYMENT_INTENT_STATUSES.SUCCEEDED) {
+				await strapi.query('paymongo-payments', pluginName).update(
+					{ id: payment.id },
+					{
+						status: 'success',
+						rawResponse: result,
+					},
+				);
+
+				return ctx.redirect(checkoutSuccessUrl);
+			}
+
+			if (status === PAYMENT_INTENT_STATUSES.AWAITING_PAYMENT_METHOD) {
+				await strapi
+					.query('paymongo-payments', pluginName)
+					.update(
+						{ id: payment.id },
+						{ status: 'fail', rawResponse: result },
+					);
+
+				return ctx.redirect(checkoutFailureUrl);
+			}
+
+			if (status === PAYMENT_INTENT_STATUSES.PROCESSING) {
+				// Need CRON job or schedule job for this OR wait for the webhook for payments
+				return next();
+			}
+
+			if (status === PAYMENT_INTENT_STATUSES.AWAITING_NEXT_ACTION) {
+				// This will probably never happen, but in case that it did, do something
+				return next();
+			}
+
+			return next();
+		} catch (err) {
+			const { errors } = err.response.body;
+
+			ctx.status = err.response.status;
+			ctx.body = { errors };
+
+			return next();
+		}
+	},
+
 	createSource: async (ctx, next) => {
-		const { amount, platform, type } = ctx.request.body;
+		const { amount, billing, type } = ctx.request.body;
 		const validTypes = ['gcash', 'grab_pay'];
 
 		if (!validTypes.includes(type)) {
@@ -91,12 +261,21 @@ module.exports = {
 		try {
 			const result = await strapi.plugins.paymongo.services.paymongo.createSource(
 				amount,
-        type,
-        platform,
+				type,
+				billing,
 			);
+
+			const {
+				data: { id: sourceId },
+			} = result;
+
+			await strapi
+				.query('paymongo-payments', pluginName)
+				.create({ type, sourceId });
+
 			ctx.send(result);
 		} catch (err) {
-			const { errors } = err.response.data;
+			const { errors } = err.response.body;
 
 			ctx.status = err.response.status;
 			ctx.body = { errors };
@@ -105,7 +284,7 @@ module.exports = {
 		}
 	},
 
-	handleWebhook: async (ctx) => {
+	handleWebhook: async (ctx, next) => {
 		try {
 			const validRequest = await strapi.plugins.paymongo.services.paymongo.verifyWebhook(
 				ctx.request.headers,
@@ -140,38 +319,59 @@ module.exports = {
 
 		if (status === 'chargeable') {
 			/** Query all payments for now, Strapi can't filter components */
-			const payments = await strapi.query('payment').find({
-        _limit: -1,
-				paymentType: sourceType,
-			});
+			const payment = await strapi
+				.query('paymongo-payments', pluginName)
+				.findOne({
+					_limit: -1,
+					type: sourceType,
+					sourceId,
+				});
 
-			const payment = payments.find(({ paymentOption: { eWallet } }) => {
-				return eWallet.type === sourceType && eWallet.sourceId === sourceId;
-			});
+			if (!payment || Object.keys(payment).length === 0) {
+				return;
+			}
 
-			if (!payment || payment.status === 'paid') return;
+			const { id, paymentId } = payment;
 
-			const {
-				id,
-				paymentId,
-				paymentOption: { eWallet },
-			} = payment;
+			try {
+				const result = await strapi.plugins.paymongo.services.paymongo.createPayment(
+					amount,
+					sourceId,
+					paymentId,
+				);
+				const {
+					data: {
+						attributes: { status: paymongoPaymentStatus },
+					},
+				} = result;
 
-			const {
-				data: { id: paymongoPaymentId },
-			} = await strapi.plugins.paymongo.services.paymongo.createPayment(
-				amount,
-				sourceId,
-				paymentId,
-			);
+				let paymentStatus;
 
-			await strapi.query('payment').update(
-				{ id },
-				{
-					paymentOption: { eWallet: { ...eWallet, reference: paymongoPaymentId } },
-					status: 'paid',
-				},
-			);
+				switch (paymongoPaymentStatus) {
+					case PAYMONGO_PAYMENT_STATUSES.PAID: {
+						paymentStatus = 'success';
+						break;
+					}
+					case PAYMONGO_PAYMENT_STATUSES.FAILED: {
+						paymentStatus = 'fail';
+						break;
+					}
+					case PAYMONGO_PAYMENT_STATUSES.PENDING:
+					default: {
+						paymentStatus = 'pending';
+					}
+				}
+
+				await strapi.query('paymongo-payments', pluginName).update(
+					{ id },
+					{
+						rawResponse: result,
+						status: paymentStatus,
+					},
+				);
+			} catch (err) {
+				await next();
+			}
 		}
 	},
 };

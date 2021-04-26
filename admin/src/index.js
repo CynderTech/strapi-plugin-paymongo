@@ -6,7 +6,8 @@ import lifecycles from './lifecycles';
 import trads from './translations';
 
 export default (strapi) => {
-	const pluginDescription = pluginPkg.strapi.description || pluginPkg.description;
+	const pluginDescription =
+		pluginPkg.strapi.description || pluginPkg.description;
 	const { icon, name } = pluginPkg.strapi;
 
 	const plugin = {
@@ -32,7 +33,7 @@ export default (strapi) => {
 					icon,
 					label: {
 						id: `${pluginId}.plugin.name`,
-						defaultMessage: 'Paymongo',
+						defaultMessage: 'PayMongo',
 					},
 					name,
 					permissions: [

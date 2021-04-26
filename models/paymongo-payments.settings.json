@@ -1,0 +1,45 @@
+{
+	"kind": "collectionType",
+	"collectionName": "payment",
+	"info": {
+		"name": "PayMongo Payments"
+	},
+	"options": {
+		"increments": true,
+		"timestamps": true
+	},
+	"attributes": {
+    "paymentId": {
+      "type": "string"
+    },
+    "type": {
+      "type": "enumeration",
+      "enum": [
+        "gcash",
+        "grab_pay",
+        "cc"
+      ]
+    },
+		"paymentIntentId": {
+      "type": "string"
+    },
+    "sourceId": {
+      "type": "string"
+    },
+    "rawResponse": {
+      "type": "json"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "pending",
+        "success",
+        "fail"
+      ],
+      "default": "pending"
+    },
+    "verificationToken": {
+      "type": "string"
+    }
+	}
+}
