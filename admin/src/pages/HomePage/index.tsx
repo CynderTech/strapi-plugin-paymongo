@@ -11,7 +11,7 @@ import {
 	Typography,
 } from '@strapi/design-system';
 import { isEmpty } from 'lodash';
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 const HomePage = () => {
 	const [token, setToken] = useState('');
@@ -23,17 +23,26 @@ const HomePage = () => {
 				title="PayMongo Settings"
 				subtitle="Configure PayMongo settings"
 			/>
-			<ContentLayout>
-				<Card background='white' padding='2rem' hasRadius={true} width='80%' paddingBottom="3rem" marginBottom='3rem'>
+			<ContentLayout paddingRight='500px'>
+				<Card background='white'
+					padding='2rem'
+					hasRadius={true}
+					paddingBottom="3rem"
+					marginBottom='3rem'
+					maxWidth='800px'
+				>
 					<Stack size={8}>
 						<Box>
-							<ToggleInput
-								label='Test Mode'
-								onLabel="True"
-								offLabel="False"
-							// checked={checked}
-							// onChange={handleChange}
-							/>
+							<Stack size={2}>
+								<Typography variant='beta'>Test Mode</Typography>
+								<ToggleInput
+									// label='Test Mode'
+									onLabel="True"
+									offLabel="False"
+								// checked={checked}
+								// onChange={handleChange}
+								/>
+							</Stack>
 						</Box>
 						<Box>
 							<Stack size={4}>
@@ -62,6 +71,13 @@ const HomePage = () => {
 								<TextInput
 									label="Test Public Key"
 									name="testPublicKey"
+									// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+									onChange={(e: any) => setToken(e.target.value)}
+									value={token}
+								/>
+								<TextInput
+									label="Test Secret Key"
+									name="testSecretKey"
 									// biome-ignore lint/suspicious/noExplicitAny: <explanation>
 									onChange={(e: any) => setToken(e.target.value)}
 									value={token}
@@ -123,7 +139,7 @@ const HomePage = () => {
 					</Stack>
 				</Card>
 			</ContentLayout>
-		</Main>
+		</Main >
 	);
 };
 
