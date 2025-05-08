@@ -1,5 +1,10 @@
-import type { Strapi } from '@strapi/strapi';
+import { SETTINGS } from './constants';
+import { getStoreSettings, setStoreSettings } from './utils';
 
-export default ({ strapi }: { strapi: Strapi }) => {
-	// bootstrap phase
+export default async ({ strapi }) => {
+	const settings = await getStoreSettings(strapi);
+
+	if (!settings) {
+		await setStoreSettings(strapi, SETTINGS);
+	}
 };

@@ -1,5 +1,5 @@
-import myService from './my-service';
+import paymongoService from './paymongo';
 
 export default {
-	myService,
+	paymongo: paymongoService,
 };

@@ -1,5 +1,5 @@
-import myController from './my-controller';
+import paymongoControllers from './paymongo';
 
 export default {
-	myController,
+	paymongo: paymongoControllers,
 };
