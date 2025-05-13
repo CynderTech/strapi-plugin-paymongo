@@ -9,7 +9,7 @@ const destroy_1 = __importDefault(require("./destroy"));
 const config_1 = __importDefault(require("./config"));
 const content_types_1 = __importDefault(require("./content-types"));
 const controllers_1 = __importDefault(require("./controllers"));
-const routes_1 = __importDefault(require("./routes"));
+const index_1 = __importDefault(require("./routes/index"));
 const middlewares_1 = __importDefault(require("./middlewares"));
 const policies_1 = __importDefault(require("./policies"));
 const services_1 = __importDefault(require("./services"));
@@ -19,7 +19,7 @@ exports.default = {
     destroy: destroy_1.default,
     config: config_1.default,
     controllers: controllers_1.default,
-    routes: routes_1.default,
+    routes: index_1.default,
     services: services_1.default,
     contentTypes: content_types_1.default,
     policies: policies_1.default,

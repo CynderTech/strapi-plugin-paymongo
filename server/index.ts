@@ -6,7 +6,7 @@ import destroy from './destroy';
 import middlewares from './middlewares';
 import policies from './policies';
 import register from './register';
-import routes from './routes';
+import routes from './routes/index';
 import services from './services';
 
 export default {

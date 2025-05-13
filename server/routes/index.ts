@@ -1,10 +1,13 @@
-export default [
-	{
-		method: 'GET',
-		path: '/',
-		handler: 'myController.index',
-		config: {
-			policies: [],
-		},
+import paymongoAdminRoutes from './admin';
+import paymongoServerRoutes from './server';
+
+export default {
+	'paymongo-admin': {
+		type: 'admin',
+		routes: [...paymongoAdminRoutes],
 	},
-];
+	paymongo: {
+		type: 'content-api',
+		routes: [...paymongoServerRoutes],
+	},
+};
