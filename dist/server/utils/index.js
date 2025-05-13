@@ -40,7 +40,9 @@ const getStore = (strapi) => {
 exports.getStore = getStore;
 const getStoreSettings = async (strapi) => {
     const pluginStore = await (0, exports.getStore)(strapi);
-    const settings = await pluginStore.get({ key: 'settings' });
+    const settings = (await pluginStore.get({
+        key: 'settings',
+    }));
     return settings;
 };
 exports.getStoreSettings = getStoreSettings;

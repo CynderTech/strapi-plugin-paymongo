@@ -1,49 +1,41 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = {
-    kind: "collectionType",
-    collectionName: "paymongo",
+    kind: 'collectionType',
+    collectionName: 'paymongo',
     info: {
-        singularName: "paymongo",
-        pluralName: "paymongos",
-        displayName: "PayMongo Payment"
+        singularName: 'paymongo',
+        pluralName: 'paymongos',
+        displayName: 'PayMongo Payment',
     },
     options: {
         draftAndPublish: false,
-        comment: ""
+        comment: '',
     },
     attributes: {
         paymentId: {
-            type: "string"
+            type: 'string',
         },
         type: {
-            type: "enumeration",
-            enum: [
-                "gcash",
-                "grab_pay",
-                "cc"
-            ]
+            type: 'enumeration',
+            enum: ['gcash', 'grab_pay', 'cc'],
         },
         paymentIntentId: {
-            type: "string"
+            type: 'string',
         },
         sourceId: {
-            type: "string"
+            type: 'string',
         },
         rawResponse: {
-            type: "json"
+            type: 'json',
         },
         status: {
-            type: "enumeration",
-            enum: [
-                "pending",
-                "success",
-                "failed"
-            ],
-            default: "pending"
+            type: 'enumeration',
+            enum: ['pending', 'success', 'failed'],
+            default: 'pending',
         },
         verificationToken: {
-            type: "string"
-        }
-    }
+            type: 'string',
+        },
+    },
 };

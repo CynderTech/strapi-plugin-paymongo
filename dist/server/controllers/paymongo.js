@@ -22,12 +22,13 @@ exports.default = ({ strapi }) => ({
         });
     },
     async createPaymentIntent(ctx) {
-        const { amount, statement_descriptor: statementDescriptor, } = ctx.request.body;
+        const { amount, statement_descriptor: statementDescriptor } = ctx.request.body;
         if (!amount) {
             return ctx.badRequest('Invalid Amount.');
         }
         try {
-            const result = await strapi.service('plugin::paymongo.paymongo')
+            const result = await strapi
+                .service('plugin::paymongo.paymongo')
                 .createPaymentIntent(amount, statementDescriptor);
             ctx.send(result);
         }
@@ -42,7 +43,8 @@ exports.default = ({ strapi }) => ({
             return ctx.badRequest('Invalid request.');
         }
         try {
-            const result = await strapi.service('plugin::paymongo.paymongo')
+            const result = await strapi
+                .service('plugin::paymongo.paymongo')
                 .attachPaymentIntent({ intentId, methodId });
             ctx.send(result);
         }
@@ -56,11 +58,14 @@ exports.default = ({ strapi }) => ({
         if (!pid || !vt) {
             return ctx.badRequest('Invalid request.');
         }
-        if (await strapi.service('plugin::paymongo.paymongo').checkIfPaymentExist(pid, vt)) {
+        if (await strapi
+            .service('plugin::paymongo.paymongo')
+            .checkIfPaymentExist(pid, vt)) {
             ctx.badRequest('Invalid request.');
         }
         try {
-            const result = await strapi.service('plugin::paymongo.paymongo')
+            const result = await strapi
+                .service('plugin::paymongo.paymongo')
                 .process3dsRedirect(pid, vt);
             if (result) {
                 return ctx.redirect(result);
@@ -78,7 +83,8 @@ exports.default = ({ strapi }) => ({
             return ctx.badRequest('Invalid request.');
         }
         try {
-            const result = await strapi.service('plugin::paymongo.paymongo')
+            const result = await strapi
+                .service('plugin::paymongo.paymongo')
                 .createSource({ amount, billing, type });
             ctx.send(result);
         }
@@ -89,7 +95,8 @@ exports.default = ({ strapi }) => ({
     },
     async handleWebhook(ctx) {
         try {
-            const validRequest = await strapi.service('plugin::paymongo.paymongo')
+            const validRequest = await strapi
+                .service('plugin::paymongo.paymongo')
                 .verifyWebhook({
                 header: ctx.request.headers,
                 payload: ctx.request.body[unparsed_1.default],
@@ -104,15 +111,17 @@ exports.default = ({ strapi }) => ({
         }
         ctx.status = 200;
         ctx.send();
-        const { data: { attributes, type } } = ctx.request.body;
+        const { data: { attributes, type }, } = ctx.request.body;
         if (type === 'event' && !constants_1.VALID_EVENT_TYPES.includes(attributes.type)) {
             return;
         }
         try {
-            await strapi.service('plugin::paymongo.paymongo').handleWebhook(attributes);
+            await strapi
+                .service('plugin::paymongo.paymongo')
+                .handleWebhook(attributes);
         }
         catch (error) {
             strapi.log.error(`Error confirming payment: ${error}`);
         }
-    }
+    },
 });

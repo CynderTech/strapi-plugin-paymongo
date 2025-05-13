@@ -3,15 +3,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const register_1 = __importDefault(require("./register"));
 const bootstrap_1 = __importDefault(require("./bootstrap"));
-const destroy_1 = __importDefault(require("./destroy"));
 const config_1 = __importDefault(require("./config"));
 const content_types_1 = __importDefault(require("./content-types"));
 const controllers_1 = __importDefault(require("./controllers"));
-const index_1 = __importDefault(require("./routes/index"));
+const destroy_1 = __importDefault(require("./destroy"));
 const middlewares_1 = __importDefault(require("./middlewares"));
 const policies_1 = __importDefault(require("./policies"));
+const register_1 = __importDefault(require("./register"));
+const index_1 = __importDefault(require("./routes/index"));
 const services_1 = __importDefault(require("./services"));
 exports.default = {
     register: register_1.default,

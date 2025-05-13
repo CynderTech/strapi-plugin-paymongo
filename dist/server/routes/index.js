@@ -8,14 +8,10 @@ const server_1 = __importDefault(require("./server"));
 exports.default = {
     'paymongo-admin': {
         type: 'admin',
-        routes: [
-            ...admin_1.default
-        ]
+        routes: [...admin_1.default],
     },
     paymongo: {
         type: 'content-api',
-        routes: [
-            ...server_1.default
-        ]
-    }
+        routes: [...server_1.default],
+    },
 };
