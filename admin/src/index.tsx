@@ -5,7 +5,7 @@ import Initializer from './components/Initializer';
 import PluginIcon from './components/PluginIcon';
 import pluginId from './pluginId';
 
-const name = pluginPkg.strapi.name;
+const { name } = pluginPkg.strapi;
 
 export default {
 	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
@@ -15,7 +15,7 @@ export default {
 			icon: PluginIcon,
 			intlLabel: {
 				id: `${pluginId}.plugin.name`,
-				defaultMessage: 'PayMongo',
+				defaultMessage: name,
 			},
 			Component: async () => {
 				const component = await import(

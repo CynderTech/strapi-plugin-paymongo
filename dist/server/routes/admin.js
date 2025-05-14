@@ -19,7 +19,7 @@ exports.default = [
         handler: 'paymongo.setSettings',
         config: {
             policies: [],
-            auth: false
+            auth: false,
         },
     },
 ];

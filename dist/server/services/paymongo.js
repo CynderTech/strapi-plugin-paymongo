@@ -22,15 +22,13 @@ exports.default = ({ strapi }) => ({
             amount,
             paymentId: paymentId,
             statement_descriptor: statementDescriptor,
-            description: `${await (0, utils_1.getDefaultDescription)(strapi, paymentId)}${statementDescriptor
-                ? ` - ${statementDescriptor}`
-                : ''}`,
+            description: `${await (0, utils_1.getDefaultDescription)(strapi, paymentId)}${statementDescriptor ? ` - ${statementDescriptor}` : ''}`,
         });
-        const { data: { id: paymentIntentId } } = body;
+        const { data: { id: paymentIntentId }, } = body;
         strapi.entityService.update('plugin::paymongo.paymongo', id, {
             data: {
-                paymentIntentId
-            }
+                paymentIntentId,
+            },
         });
         return body;
     },
@@ -44,7 +42,7 @@ exports.default = ({ strapi }) => ({
             const [payment] = await strapi.entityService.findMany('plugin::paymongo.paymongo', {
                 filters: {
                     paymentIntentId: payload.id,
-                }
+                },
             });
             if (payment && Object.keys(payment).length > 0) {
                 overrides = {
@@ -55,15 +53,15 @@ exports.default = ({ strapi }) => ({
         }
         const { body } = await client.attachPaymentIntent({
             ...payload,
-            ...overrides
+            ...overrides,
         });
-        const { data: { attributes } } = body;
+        const { data: { attributes }, } = body;
         const { status } = attributes;
         if (status === 'succeeded') {
             const [payment] = await strapi.entityService.findMany('plugin::paymongo.paymongo', {
                 filters: {
-                    paymentIntentId: payload.id
-                }
+                    paymentIntentId: payload.id,
+                },
             });
             strapi.entityService.update('plugin::paymongo.paymongo', payment.id, {
                 data: {
@@ -73,7 +71,7 @@ exports.default = ({ strapi }) => ({
         }
         return body;
     },
-    async createSource({ amount, billing, type }) {
+    async createSource({ amount, billing, type, }) {
         const settings = await (0, utils_1.getStoreSettings)(strapi);
         const { checkout_failure_url: checkoutFailureUrl, checkout_success_url: checkoutSuccessUrl, } = settings;
         const client = await (0, utils_1.getClient)(strapi);
@@ -86,23 +84,23 @@ exports.default = ({ strapi }) => ({
             },
             billing,
         });
-        const { data: { id: sourceId } } = body;
+        const { data: { id: sourceId }, } = body;
         await strapi.entityService.create('plugin::paymongo.paymongo', {
             data: {
                 type,
-                sourceId
+                sourceId,
             },
         });
         return body;
     },
-    async createPayment({ amount, sourceId, paymentId, statementDescriptor = null }) {
+    async createPayment({ amount, sourceId, paymentId, statementDescriptor = null, }) {
         const client = await (0, utils_1.getClient)(strapi);
         const { body } = await client.createPayment({
             amount,
             description: `${await (0, utils_1.getDefaultDescription)(strapi, paymentId)}${statementDescriptor ? ` - ${statementDescriptor}` : ''}`,
             source: {
                 id: sourceId,
-                type: 'source'
+                type: 'source',
             },
         });
         return body;
@@ -117,7 +115,7 @@ exports.default = ({ strapi }) => ({
             filters: {
                 verificationToken: vt,
                 paymentId: pid,
-            }
+            },
         });
         return !payment || Object.keys(payment).length === 0;
     },
@@ -126,11 +124,12 @@ exports.default = ({ strapi }) => ({
             filters: {
                 verificationToken: vt,
                 paymentId: pid,
-            }
+            },
         });
-        const result = await strapi.service('plugin::paymongo.paymongo')
+        const result = await strapi
+            .service('plugin::paymongo.paymongo')
             .retrievePaymentIntent(payment.paymentIntentId);
-        const { data: { attributes } } = result;
+        const { data: { attributes }, } = result;
         const { status } = attributes;
         const settings = await (0, utils_1.getStoreSettings)(strapi);
         const { checkout_failure_url: checkoutFailureUrl, checkout_success_url: checkoutSuccessUrl, } = settings;
@@ -138,7 +137,7 @@ exports.default = ({ strapi }) => ({
             strapi.entityService.update('plugin::paymongo.paymongo', payment.id, {
                 data: {
                     status: 'success',
-                    rawResponse: result
+                    rawResponse: result,
                 },
             });
             return checkoutSuccessUrl;
@@ -147,7 +146,7 @@ exports.default = ({ strapi }) => ({
             await strapi.entityService.update('plugin::paymongo.paymongo', payment.id, {
                 data: {
                     status: 'fail',
-                    rawResponse: result
+                    rawResponse: result,
                 },
             });
             return checkoutFailureUrl;
@@ -162,34 +161,36 @@ exports.default = ({ strapi }) => ({
         }
         return null;
     },
-    async verifyWebhook({ header, payload }) {
+    async verifyWebhook({ header, payload, }) {
         const paymongoHeader = header['paymongo-signature'];
         if (!paymongoHeader)
             return false;
         const settings = await (0, utils_1.getStoreSettings)(strapi);
-        const { test_mode: testMode, webhook_secret_key: webhookSecretKey, } = settings;
+        const { test_mode: testMode, webhook_secret_key: webhookSecretKey } = settings;
         return paymongo_client_1.default.verifyWebhook(webhookSecretKey, paymongoHeader, payload, testMode ? 'test' : 'live');
     },
     async handleWebhook(attributes) {
-        const { data: { attributes: { amount, status, type: sourceType }, id: sourceId }, } = attributes;
+        const { data: { attributes: { amount, status, type: sourceType }, id: sourceId, }, } = attributes;
         if (status === 'chargeable') {
             const [payment] = await strapi.entityService.findMany('plugin::paymongo.paymongo', {
                 filters: {
                     sourceId,
-                    type: sourceType
-                }
+                    type: sourceType,
+                },
             });
             if (!payment || Object.keys(payment).length === 0) {
                 strapi.log.error('No matching payment found');
                 return;
             }
             const { id, paymentId } = payment;
-            const result = await strapi.service('plugin::paymongo.paymongo').createPayment({
+            const result = await strapi
+                .service('plugin::paymongo.paymongo')
+                .createPayment({
                 amount,
                 sourceId,
                 paymentId,
             });
-            const { data: { attributes: { status: paymongoPaymentStatus, }, }, } = result;
+            const { data: { attributes: { status: paymongoPaymentStatus }, }, } = result;
             let paymentStatus;
             switch (paymongoPaymentStatus) {
                 case constants_1.PAYMONGO_PAYMENT_STATUSES.PAID:
@@ -207,7 +208,7 @@ exports.default = ({ strapi }) => ({
             await strapi.entityService.update('plugin::paymongo.paymongo', id, {
                 data: {
                     status: paymentStatus,
-                    rawResponse: result
+                    rawResponse: result,
                 },
             });
         }

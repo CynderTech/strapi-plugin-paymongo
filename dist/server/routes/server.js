@@ -10,7 +10,7 @@ exports.default = [
         handler: 'paymongo.createPaymentIntent',
         config: {
             policies: [],
-            auth: false
+            auth: false,
         },
     },
     {

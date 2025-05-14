@@ -3,9 +3,10 @@
   "version": "2.0.0",
   "description": "Strapi plugin for Paymongo - Community Edition",
   "strapi": {
-    "name": "paymongo",
+    "name": "PayMongo",
     "icon": "plug",
-    "description": "A Strapi plugin to interface with PayMongo API"
+    "description": "A Strapi plugin to interface with PayMongo API",
+    "kind": "plugin"
   },
   "scripts": {
     "lint": "biome lint",

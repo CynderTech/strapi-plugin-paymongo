@@ -8,6 +8,6 @@ const lifecycles_1 = __importDefault(require("./paymongo/lifecycles"));
 exports.default = {
     paymongo: {
         schema: paymongo_1.default,
-        lifecycles: lifecycles_1.default
+        lifecycles: lifecycles_1.default,
     },
 };

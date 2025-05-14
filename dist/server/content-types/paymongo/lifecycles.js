@@ -8,7 +8,7 @@ const lifecycle = {
         data = {
             ...data,
             paymentId: nanoid(),
-            verificationToken: nanoid()
+            verificationToken: nanoid(),
         };
     },
 };

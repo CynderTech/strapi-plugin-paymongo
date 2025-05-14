@@ -1,10 +1,20 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const constants_1 = require("./constants");
-const utils_1 = require("./utils");
 exports.default = async ({ strapi }) => {
-    const settings = await (0, utils_1.getStoreSettings)(strapi);
+    var _a;
+    const pluginStore = (_a = strapi.store) === null || _a === void 0 ? void 0 : _a.call(strapi, {
+        environment: '',
+        type: 'plugin',
+        name: 'paymongo',
+    });
+    const settings = (await pluginStore.get({
+        key: 'settings',
+    }));
     if (!settings) {
-        await (0, utils_1.setStoreSettings)(strapi, constants_1.SETTINGS);
+        await pluginStore.set({
+            key: 'settings',
+            value: constants_1.SETTINGS,
+        });
     }
 };
