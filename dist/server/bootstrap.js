@@ -8,9 +8,9 @@ exports.default = async ({ strapi }) => {
         type: 'plugin',
         name: 'paymongo',
     });
-    const settings = (await pluginStore.get({
+    const settings = await pluginStore.get({
         key: 'settings',
-    }));
+    });
     if (!settings) {
         await pluginStore.set({
             key: 'settings',

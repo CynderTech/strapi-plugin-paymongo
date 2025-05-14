@@ -2,14 +2,10 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const nanoid_1 = require("nanoid");
 const nanoid = (0, nanoid_1.customAlphabet)('1234567890ABCDEF', 15);
-const lifecycle = {
+const lifecycles = {
     async beforeCreate(event) {
-        let { data } = event.params;
-        data = {
-            ...data,
-            paymentId: nanoid(),
-            verificationToken: nanoid(),
-        };
+        event.params.data.paymentId = nanoid();
+        event.params.data.verificationToken = nanoid();
     },
 };
-exports.default = lifecycle;
+exports.default = lifecycles;
