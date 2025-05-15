@@ -2,16 +2,11 @@ import { customAlphabet } from 'nanoid';
 
 const nanoid = customAlphabet('1234567890ABCDEF', 15);
 
-const lifecycle = {
+const lifecycles = {
 	async beforeCreate(event) {
-		let { data } = event.params;
-
-		data = {
-			...data,
-			paymentId: nanoid(),
-			verificationToken: nanoid(),
-		};
+		event.params.data.paymentId = nanoid();
+		event.params.data.verificationToken = nanoid();
 	},
 };
 
-export default lifecycle;
+export default lifecycles;
