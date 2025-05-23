@@ -142,7 +142,7 @@ export default ({ strapi }) => ({
 			data: { attributes, type },
 		} = ctx.request.body;
 
-		if (type === 'event' && !VALID_EVENT_TYPES.includes(attributes.type)) {
+		if (type === 'event' && !VALID_EVENT_TYPES.includes(type)) {
 			return;
 		}
 

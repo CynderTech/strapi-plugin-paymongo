@@ -10,7 +10,6 @@ exports.default = [
         handler: 'paymongo.createPaymentIntent',
         config: {
             policies: [],
-            auth: false,
         },
     },
     {
@@ -19,7 +18,6 @@ exports.default = [
         handler: 'paymongo.attachPaymentIntent',
         config: {
             policies: [],
-            auth: false,
         },
     },
     {
@@ -28,7 +26,6 @@ exports.default = [
         handler: 'paymongo.createSource',
         config: {
             policies: [],
-            auth: false,
         },
     },
     {
@@ -37,7 +34,6 @@ exports.default = [
         handler: 'paymongo.handleWebhook',
         config: {
             policies: [],
-            auth: false,
         },
     },
     {
@@ -46,7 +42,6 @@ exports.default = [
         handler: 'paymongo.process3dsRedirect',
         config: {
             policies: [],
-            auth: false,
         },
     },
 ];

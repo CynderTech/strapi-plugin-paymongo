@@ -112,7 +112,7 @@ exports.default = ({ strapi }) => ({
         ctx.status = 200;
         ctx.send();
         const { data: { attributes, type }, } = ctx.request.body;
-        if (type === 'event' && !constants_1.VALID_EVENT_TYPES.includes(attributes.type)) {
+        if (type === 'event' && !constants_1.VALID_EVENT_TYPES.includes(type)) {
             return;
         }
         try {
