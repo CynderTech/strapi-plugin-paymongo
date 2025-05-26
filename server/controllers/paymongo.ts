@@ -2,8 +2,6 @@
  *  PayMongo controller
  */
 
-import unparsed from 'koa-body/unparsed';
-
 import { VALID_EVENT_TYPES, VALID_SOURCE_TYPES } from '../constants';
 import { getStoreSettings, setStoreSettings } from '../utils';
 
@@ -123,7 +121,7 @@ export default ({ strapi }) => ({
 				.service('plugin::paymongo.paymongo')
 				.verifyWebhook({
 					header: ctx.request.headers,
-					payload: ctx.request.body[unparsed],
+					payload: ctx.request.body[Symbol.for('unparsedBody')],
 				});
 
 			if (!validRequest) {

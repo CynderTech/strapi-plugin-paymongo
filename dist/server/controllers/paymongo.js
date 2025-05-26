@@ -2,11 +2,7 @@
 /**
  *  PayMongo controller
  */
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const unparsed_1 = __importDefault(require("koa-body/unparsed"));
 const constants_1 = require("../constants");
 const utils_1 = require("../utils");
 exports.default = ({ strapi }) => ({
@@ -99,7 +95,7 @@ exports.default = ({ strapi }) => ({
                 .service('plugin::paymongo.paymongo')
                 .verifyWebhook({
                 header: ctx.request.headers,
-                payload: ctx.request.body[unparsed_1.default],
+                payload: ctx.request.body[Symbol.for('unparsedBody')],
             });
             if (!validRequest) {
                 throw new Error('Invalid webhook request.');
@@ -112,7 +108,7 @@ exports.default = ({ strapi }) => ({
         ctx.status = 200;
         ctx.send();
         const { data: { attributes, type }, } = ctx.request.body;
-        if (type === 'event' && !constants_1.VALID_EVENT_TYPES.includes(type)) {
+        if (type === 'event' && !constants_1.VALID_EVENT_TYPES.includes(attributes.type)) {
             return;
         }
         try {
