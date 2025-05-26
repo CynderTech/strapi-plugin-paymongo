@@ -150,6 +150,8 @@ export default ({ strapi }) => ({
 				.handleWebhook(attributes);
 		} catch (error) {
 			strapi.log.error(`Error confirming payment: ${error}`);
+			ctx.status = 400;
+			ctx.badRequest();
 		}
 	},
 });
